@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Koordinat Kartesius – Bintang Bergeser</title>
+
+    <!-- Import Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Menggunakan font Inter dan skema warna cerah */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style untuk Canvas */
+        #coordinateCanvas {
+            border: 2px solid #6366F1; /* Indigo */
+            background-color: #F8FAFC; /* Abu-abu sangat muda */
+            touch-action: none; /* Mencegah tindakan default browser pada sentuhan */
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Bintang -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-yellow-400 to-indigo-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Misteri Bintang Bergeser</h1>
+            <p class="text-lg font-light">Memecahkan Urutan Transformasi Geometri Terbalik</p>
+        </div>
+        <div class="text-5xl">
+        ✨🗺️
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col lg:flex-row gap-8">
+        
+        <!-- Kolom Grafik Kartesius Interaktif -->
+        <div class="lg:w-1/2 flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">Visualisasi Koordinat</h2>
+            <div class="w-full aspect-square flex items-center justify-center bg-gray-50 rounded-xl p-2 shadow-inner">
+                <canvas id="coordinateCanvas" width="350" height="350" class="w-full h-full max-w-[400px]"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-gray-600 font-semibold text-center">Titik A, B, C akan muncul setelah Anda mengirim jawaban.</p>
+        </div>
+
+        <!-- Kolom Pertanyaan HOTS -->
+        <div class="lg:w-1/2">
+            <div class="question-box p-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-indigo-700 mb-4">
+                    Nomor 6
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Sebuah Bintang A berada pada koordinat awal (x, y) yang tidak diketahui.
+                    <br><br>
+                    1. Bintang A dicerminkan terhadap sumbu Y menjadi Bintang B.
+                    <br>
+                    2. Kemudian, Bintang B digeser (translasi) 5 unit ke bawah dan 2 unit ke kanan menjadi Bintang C.
+                    <br><br>
+                    Jika posisi akhir Bintang C adalah <b>(1, -3)</b>, tentukan koordinat awal Bintang A!
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>A. (-1, 2)</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>B. (3, -8)</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>C. (1, 2)</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>D. (-3, 8)</span>
+                    </label>
+                </div>
+                
+                <!-- TOMBOL SUBMIT -->
+                <button id="checkButton" onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-indigo-700 active:scale-[0.98]">
+                    SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+                
+                <!-- TOMBOL SOAL 7 (SUDAH DIUBAH STYLE-NYA) -->
+                <div id="nextBox" class="mt-4 hidden">
+                    <button onclick="keNomor7()"
+                        class="w-full px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-indigo-700 active:scale-[0.98]">
+                        Nomor 7 
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variabel Global
+const canvas = document.getElementById('coordinateCanvas');
+const ctx = canvas.getContext('2d');
+const size = 350;
+const scale = 25; // Skala 1 unit = 25 piksel
+const offset = size / 2; // Titik (0,0) di tengah canvas
+const gridSize = size / scale; // Ukuran grid (14x14)
+
+// Fungsi untuk menggambar koordinat kartesius
+function drawGrid() {
+    ctx.clearRect(0, 0, size, size);
+
+    // Garis Sumbu X dan Y
+    ctx.strokeStyle = '#1E3A8A'; 
+    ctx.lineWidth = 2;
+    // Sumbu X
+    ctx.beginPath();
+    ctx.moveTo(0, offset);
+    ctx.lineTo(size, offset);
+    ctx.stroke();
+    // Sumbu Y
+    ctx.beginPath();
+    ctx.moveTo(offset, 0);
+    ctx.lineTo(offset, size);
+    ctx.stroke();
+
+    // Garis Kisi-kisi
+    ctx.strokeStyle = '#D1D5DB'; 
+    ctx.lineWidth = 1;
+    ctx.font = '10px Inter';
+    ctx.fillStyle = '#111827';
+    ctx.textAlign = 'center';
+
+    for (let i = -size / 2; i <= size / 2; i += scale) {
+        // Garis vertikal
+        ctx.beginPath();
+        ctx.moveTo(offset + i, 0);
+        ctx.lineTo(offset + i, size);
+        ctx.stroke();
+
+        // Garis horizontal
+        ctx.beginPath();
+        ctx.moveTo(0, offset + i);
+        ctx.lineTo(size, offset + i);
+        ctx.stroke();
+
+        // Label
+        if (i !== 0 && i % scale === 0) {
+            let num = i / scale;
+            ctx.fillText(num, offset + i, offset + 15);
+            ctx.fillText(-num, offset - 15, offset - i + 3);
+        }
+    }
+}
+
+// Fungsi untuk menggambar sebuah titik
+function drawPoint(x, y, color, label) {
+    const px = offset + x * scale;
+    const py = offset - y * scale; 
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(px, py, 5, 0, Math.PI * 2); 
+    ctx.fill();
+
+    ctx.fillStyle = '#111827';
+    ctx.font = '12px Inter Bold';
+    ctx.textAlign = 'left';
+    ctx.fillText(label + `(${x}, ${y})`, px + 8, py - 5);
+}
+
+// Koordinat
+const coordA = { x: 1, y: 2 }; // Jawaban yang dicari
+const coordB = { x: -1, y: 2 }; // Pencerminan A terhadap Y
+const coordC = { x: 1, y: -3 }; // Translasi B (2 kanan, 5 bawah)
+
+// Gambar solusi
+function drawSolution() {
+    drawGrid();
+
+    ctx.strokeStyle = '#A8A29E'; 
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    
+    ctx.beginPath();
+    ctx.moveTo(offset + coordA.x * scale, offset - coordA.y * scale);
+    ctx.lineTo(offset + coordB.x * scale, offset - coordB.y * scale);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(offset + coordB.x * scale, offset - coordB.y * scale);
+    ctx.lineTo(offset + coordC.x * scale, offset - coordC.y * scale);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    drawPoint(coordA.x, coordA.y, '#34D399', 'A ');
+    drawPoint(coordB.x, coordB.y, '#FCD34D', 'B ');
+    drawPoint(coordC.x, coordC.y, '#EF4444', 'C ');
+}
+
+// Kunci jawaban
+const kunciJawaban = "C"; 
+
+const miskonsepsiMap = {
+    "A": "Miskonsepsi: Anda mungkin hanya membalikkan translasi (shift 5 up, 2 left) pada C, tapi lupa membalikkan pencerminan.",
+    "B": "Miskonsepsi: Anda salah membalikkan pencerminan atau translasi. Coba ulangi urutan terbalik: C → B (Reverse Translasi), lalu B → A (Reverse Pencerminan Y).",
+    "D": "Miskonsepsi: Mungkin Anda mencerminkan C terlebih dahulu, lalu membalikkan translasi, atau salah menentukan arah pergeseran." 
+};
+
+// SIMPAN NILAI LEVEL 1
+function simpanJawabanLevel1({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level1";
+
+    let rekap = sessionStorage.getItem(KEY);
+    if (!rekap) {
+        rekap = {
+            totalBenar: 0,
+            totalSalah: 0,
+            daftar: []
+        };
+    } else {
+        rekap = JSON.parse(rekap);
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+    sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// BN GLOBAL
+function initBN() {
+  let BN = JSON.parse(sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4,
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    let benar = false;
+
+    drawSolution();
+    
+    if (answer === kunciJawaban) {
+        benar = true;
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🌟 Solusi Super HOTS Tepat! <br>" +
+            "1. C → B (Reverse Translasi): C(1, -3) digeser 2 ke kiri dan 5 ke atas → B(-1, 2).<br>" +
+            "2. B → A (Reverse Pencerminan Y): B(-1, 2) dicermin terhadap sumbu Y → A(1, 2).";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Hampir Tepat! <br>" +
+            "Gunakan urutan balik: dari C(1, -3) kembalikan translasi, lalu kembalikan pencerminan Y.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam membalikkan operasi atau urutan transformasi.") +
+            "</i>";
+    }
+
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    simpanJawabanLevel1({
+      soalId: "Nomor6",
+      benar,
+      jawaban: answer,
+      kunci: kunciJawaban
+    });
+
+    updateBN("M6", benar);
+
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+function keNomor7() {
+    // sesuaikan dengan nama file nomor 7 kamu
+    window.location.href = "lv1soal7.html";
+}
+
+// Inisialisasi grid saat halaman dimuat
+window.onload = drawGrid;
+</script>
+
+</body>
+</html>

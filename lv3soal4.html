@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kuis HOTS Level 3 – Soal 4: Analisis Sebaran Data Dua Tim</title>
+
+    <!-- Chart.js & Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { width: 100%; height: 100%; }
+    </style>
+</head>
+
+<body class="bg-teal-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-green-400 via-teal-500 to-blue-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Level 3 – Soal 4</h1>
+            <p class="text-lg font-light">Analisis Sebaran Skor Game Cepat Tanggap</p>
+        </div>
+        <div class="text-5xl">🎮🏆</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col   gap-8">
+
+        <!-- GRAFIK -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Frekuensi Skor Tim A dan Tim B
+            </h2>
+
+            <div class="w-full h-64 md:h-80 bg-gray-50 rounded-xl p-4 shadow-inner chart-container">
+                <canvas id="barChartSuperHots"></canvas>
+            </div>
+
+            <div class="mt-4 p-3 bg-blue-100 rounded-lg text-sm text-blue-700 font-medium w-full">
+                Petunjuk: Frekuensi Tim B pada skor 3 = X. Total data kedua tim = 100.
+            </div>
+        </div>
+
+        <!-- SOAL -->
+        <div class="lg:w-full">
+            <div class="p-6 bg-green-100 border-2 border-green-500 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-teal-700 mb-4">
+                    Nomor 4
+                </p>
+
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Frekuensi skor dari kedua tim:
+                    <ul class="list-disc list-inside ml-4 space-y-1 mt-2">
+                        <li>Tim A: 5, 10, 15, 10, 5</li>
+                        <li>Tim B: 5, 8, X, 15, 7</li>
+                    </ul>
+                    Total data kedua tim = <b>100 siswa</b>.
+                    <br><br>
+                    Tugas Anda:
+                    <br>
+                    Setelah menemukan nilai X, hitung:
+                    <br>
+                    <b>(Range B − Range A) × Modus B</b>, lalu dibagi <b>(Total data Tim B ÷ 11)</b>.
+                </p>
+
+                <!-- OPSI -->
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-green-200 transition">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        A. 3
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-green-200 transition">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        B. 5
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-green-200 transition">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        C. 7
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-green-200 transition">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        D. 10
+                    </label>
+                </div>
+
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-teal-600 text-white font-bold rounded-xl shadow-md transition hover:scale-[1.02] hover:bg-teal-700">
+                    SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden"></div>
+
+                <!-- NEXT BUTTON -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal5()" 
+                            class="w-full px-6 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-md hover:bg-blue-700">
+                       Nomor 5  
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====================== GRAFIK ======================
+window.onload = function () {
+    const ctx = document.getElementById("barChartSuperHots").getContext("2d");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: ["Skor 1", "Skor 2", "Skor 3", "Skor 4", "Skor 5"],
+            datasets: [
+                {
+                    label: "Tim A",
+                    data: [5, 10, 15, 10, 5],
+                    backgroundColor: "#3B82F6",
+                    borderRadius: 6,
+                },
+                {
+                    label: "Tim B",
+                    data: [5, 8, 20, 15, 7], // X = 20
+                    backgroundColor: "#10B981",
+                    borderRadius: 6,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, max: 25 } },
+        },
+    });
+};
+
+// ====================== ANALISIS ======================
+// Kunci benar:
+const kunciJawaban = "A"; // hasil = 3
+
+// Untuk penjelasan miskonsepsi
+const miskonsepsiMap = {
+    B: "Anda mungkin salah menentukan Modus Tim B (seharusnya skor 3).",
+    C: "Anda mungkin salah menghitung total data Tim B (55).",
+    D: "Anda mungkin hanya mengalikan range tanpa pembagian terakhir.",
+};
+
+// ====================== SIMPAN REKAP LEVEL 3 ======================
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level3";
+    let data = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!data) {
+        data = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    data.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString(),
+    });
+
+    if (benar) data.totalBenar++;
+    else data.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(data));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====================== CEK JAWABAN ======================
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedback = document.getElementById("feedback");
+    feedback.classList.remove("hidden");
+
+    if (!pilihan) {
+        feedback.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border bg-yellow-100 border-yellow-500 text-yellow-800";
+        feedback.innerHTML = "❗ Pilih jawaban dulu.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = answer === kunciJawaban;
+
+    if (benar) {
+        feedback.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border bg-green-100 border-green-500 text-green-800";
+
+        feedback.innerHTML = `
+            🧠 <b>Jawaban Benar!</b><br>
+            X = 20. Range A = 10. Range B = 15. Modus B = 3.<br>
+            Rumus: (15 − 10) × 3 ÷ (55 ÷ 11) = 3.
+        `;
+    } else {
+        feedback.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border bg-red-100 border-red-500 text-red-800";
+
+        feedback.innerHTML = `
+            ❌ Jawaban kurang tepat.<br>
+            Miskonsepsi: <i>${miskonsepsiMap[answer] || "Periksa kembali langkah perhitungan X dan jangkauan frekuensi."}</i>
+        `;
+    }
+
+    // Simpan ke rekap level 3
+    simpanJawabanLevel3({
+        soalId: "lv3soal4",
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban,
+    });
+
+    // Update BN
+    updateBN("M8", benar);
+
+    // Disable opsi
+    document.querySelectorAll('input[name="jawaban"]').forEach((r) => (r.disabled = true));
+
+    // Munculkan tombol lanjut
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====================== KE SOAL 5 ======================
+function kesoal5() {
+    window.location.href = "lv3soal5.html";
+}
+</script>
+
+</body>
+</html>

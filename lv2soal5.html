@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Statistika SMP – Persentase ke Frekuensi</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 450px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="bg-emerald-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-green-500 to-lime-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Olahraga Favorit Siswa SMP Harapan</h1>
+            <p class="text-lg font-light">Mencari Total Populasi dan Selisih Frekuensi</p>
+        </div>
+        <div class="text-5xl">⚽️🏀🏐</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <!-- Grafik lingkaran -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Persentase Minat Olahraga Siswa
+            </h2>
+            <div class="chart-container h-72 md:h-96 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="pieChartOlahraga"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-green-700 font-semibold text-center">
+                Data: Sepak Bola (35%), Basket (20% - 40 siswa), Bulutangkis (25%), Voli (sisanya)
+            </p>
+        </div>
+
+        <!-- Soal HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-lime-100 border-2 border-lime-500 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-green-700 mb-4">
+                    Nomor 5
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Diagram lingkaran menunjukkan hasil survei olahraga favorit seluruh siswa. 
+                    <br><br>
+                    Diketahui: Sepak Bola (35%), Basket (20% atau 40 siswa), Bulutangkis (25%), dan sisanya memilih Voli.
+                    <br><br>
+                    Jika semua data tersebut dikumpulkan dari <b>seluruh</b> siswa, berapakah selisih jumlah siswa (frekuensi)
+                    antara olahraga dengan <b>persentase tertinggi</b> dan olahraga dengan <b>persentase terendah</b>?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-lime-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-green-600 h-5 w-5 mr-4">
+                        <span>A. 60 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-lime-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-green-600 h-5 w-5 mr-4">
+                        <span>B. 70 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-lime-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-green-600 h-5 w-5 mr-4">
+                        <span>C. 90 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-lime-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-green-600 h-5 w-5 mr-4">
+                        <span>D. 100 siswa</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-green-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- TOMBOL LANJUT KE SOAL 6 -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal6()" 
+                            class="w-full px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-md hover:bg-indigo-700 transition">
+                         Nomor 6
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK LINGKARAN ======
+window.onload = function() {
+    const persenSepakBola   = 35; // tertinggi
+    const persenBasket      = 20; // 40 siswa
+    const persenBulutangkis = 25;
+    const persenVoli        = 100 - (persenSepakBola + persenBasket + persenBulutangkis); // 20%
+
+    // Total siswa dari info Basket: 20% = 40 siswa → N = 40 / 0.20 = 200
+    const totalSiswa  = 200;
+    const jmlSepakBola   = (persenSepakBola   / 100) * totalSiswa; // 70
+    const jmlBasket      = (persenBasket      / 100) * totalSiswa; // 40
+    const jmlBulutangkis = (persenBulutangkis / 100) * totalSiswa; // 50
+    const jmlVoli        = (persenVoli        / 100) * totalSiswa; // 40
+
+    const dataMinat = [
+        { label: `Sepak Bola (${jmlSepakBola} siswa)`,   persen: persenSepakBola },
+        { label: `Basket (${jmlBasket} siswa)`,          persen: persenBasket },
+        { label: `Bulutangkis (${jmlBulutangkis} siswa)`,persen: persenBulutangkis },
+        { label: `Voli (${jmlVoli} siswa)`,              persen: persenVoli }
+    ];
+
+    const ctx        = document.getElementById('pieChartOlahraga').getContext('2d');
+    const labels     = dataMinat.map(d => d.label);
+    const dataPoints = dataMinat.map(d => d.persen);
+
+    const colors = [
+        '#047857', // Sepak bola
+        '#FBBF24', // Basket
+        '#A78BFA', // Bulutangkis
+        '#EF4444'  // Voli
+    ];
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels,
+            datasets: [{
+                data: dataPoints,
+                backgroundColor: colors,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            return label + ' (' + value + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ====== LOGIKA SOAL ======
+/*
+Total siswa N = 200
+Frekuensi tertinggi: Sepak bola 35% → 70 siswa
+Frekuensi terendah: Voli / Basket 20% → 40 siswa
+Selisih frekuensi = 70 − 40 = 30 siswa → opsi D
+*/
+const kunciJawaban = "D";
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin mengira selisihnya adalah 60, padahal frekuensi terendah hanya 40 siswa.",
+    "B": "Anda mungkin tertukar antara frekuensi dan persentase, atau salah menghitung total siswa.",
+    "C": "Anda mungkin salah menghitung total siswa (N) atau salah memilih kategori terendah.",
+};
+
+function simpanJawabanLevel2({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level2";
+    let rekap = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!rekap) {
+        rekap = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan    = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar  = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🏆 Perhitungan Juara!<br>" +
+            "1. <b>Total siswa (N):</b> 20% = 40 siswa → N = 40 / 0,20 = <b>200 siswa</b>.<br>" +
+            "2. <b>Frekuensi tertinggi:</b> Sepak bola 35% → 0,35 × 200 = <b>70 siswa</b>.<br>" +
+            "3. <b>Frekuensi terendah:</b> Voli / Basket 20% → 0,20 × 200 = <b>40 siswa</b>.<br>" +
+            "4. <b>Selisih frekuensi:</b> 70 − 40 = <b>30 siswa</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Multi-Langkah Kurang Tepat!<br>" +
+            "Soal ini menguji: 1) mengubah persentase ke frekuensi dengan total siswa (N), 2) memilih kategori tertinggi dan terendah, 3) menghitung selisih frekuensi.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menghitung N atau salah memilih kategori dengan frekuensi terendah.") +
+            "</i>";
+    }
+
+    // simpan rekap level 2
+  simpanJawabanLevel2({
+    soalId: "Nomor5",   // sesuaikan kalau ID-soalmu beda
+    benar,
+    jawaban: answer,
+    kunci: kunciJawaban
+  });
+
+  // update BN → soal ini memetakan miskonsepsi M4
+  updateBN("M4", benar);
+
+    // Disable pilihan setelah kirim
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // Tampilkan tombol lanjut ke Soal 6
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====== PINDAH KE SOAL 6 ======
+function kesoal6() {
+    // Pastikan nama file soal 6 sesuai
+    window.location.href = "lv2soal6.html";
+}
+</script>
+
+</body>
+</html>

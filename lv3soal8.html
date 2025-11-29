@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Super HOTS Level 3 – Soal 8</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { width: 100%; height: 100%; }
+    </style>
+</head>
+<body class="bg-pink-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <div class="p-6 md:p-8 bg-gradient-to-r from-red-400 via-pink-500 to-purple-400 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Level 3 – Soal 8</h1>
+            <p class="text-lg font-light">Analisis Titik Optimal SPLDV</p>
+        </div>
+        <div class="text-5xl">🎢🏎️🎉</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Grafik Hubungan Kecepatan dan Waktu
+            </h2>
+
+            <div class="w-full h-64 md:h-80 bg-gray-50 rounded-xl p-4 shadow-inner chart-container flex items-center justify-center">
+                <canvas id="splvChartSuperHots"></canvas>
+            </div>
+
+            <div class="mt-4 p-3 bg-red-100 rounded-lg text-sm text-red-700 font-medium w-full">
+                x = Kecepatan Awal (km/jam), y = Waktu Tempuh (jam).
+            </div>
+        </div>
+
+        <div class="lg:w-full">
+            <div class="p-6 bg-pink-100 border-2 border-pink-500 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-red-700 mb-4">
+                    Nomor 8
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Sistem persamaan berasal dari dua garis:
+                    <br><br>
+                    Garis A: melewati (3,8) dan (9,4)  
+                    Garis B: melewati (2,3) dan (8,9)
+                    <br><br>
+                    Setelah menemukan (x₀, y₀), hitung nilai:
+                    <br>
+                    <b>(10 × x₀) + (15 × y₀) − 100</b>
+                </p>
+
+                <div class="space-y-4">
+                    <label class="flex items-center p-3 bg-white shadow rounded-lg cursor-pointer hover:bg-pink-200">
+                        <input type="radio" name="jawaban" value="A" class="h-5 w-5 mr-4 text-red-600">
+                        A. 40
+                    </label>
+
+                    <label class="flex items-center p-3 bg-white shadow rounded-lg cursor-pointer hover:bg-pink-200">
+                        <input type="radio" name="jawaban" value="B" class="h-5 w-5 mr-4 text-red-600">
+                        B. 45
+                    </label>
+
+                    <label class="flex items-center p-3 bg-white shadow rounded-lg cursor-pointer hover:bg-pink-200">
+                        <input type="radio" name="jawaban" value="C" class="h-5 w-5 mr-4 text-red-600">
+                        C. 50
+                    </label>
+
+                    <label class="flex items-center p-3 bg-white shadow rounded-lg cursor-pointer hover:bg-pink-200">
+                        <input type="radio" name="jawaban" value="D" class="h-5 w-5 mr-4 text-red-600">
+                        D. 55
+                    </label>
+                </div>
+
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-md hover:bg-red-700 transform hover:scale-[1.02]">
+                    SUBMIT
+                </button>
+
+                <div id="feedback" class="hidden mt-6 p-4 rounded-xl text-md font-semibold border transition-all duration-300"></div>
+
+                <div id="nextBox" class="hidden mt-6">
+                    <button onclick="kesoal9()" 
+                            class="w-full px-6 py-3 rounded-xl bg-pink-600 text-white font-bold shadow-md hover:bg-pink-700">
+                        Nomor 9  
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========================== PERHITUNGAN SPLDV ==========================
+// Garis A: (3,8) dan (9,4) -> m = (4-8)/(9-3) = -4/6 = -2/3. Persamaan: y - 8 = -2/3(x - 3) => 3y - 24 = -2x + 6 => 2x + 3y = 30
+// Garis B: (2,3) dan (8,9) -> m = (9-3)/(8-2) = 6/6 = 1. Persamaan: y - 3 = 1(x - 2) => y = x + 1 => x - y = -1
+// Eliminasi/Substitusi:
+// 2x + 3y = 30
+// 2x - 2y = -2 
+// ----------- (-)
+// 5y = 32 => y = 32/5 = 6.4
+// x = y - 1 = 6.4 - 1 = 5.4
+// Solusi: (x₀, y₀) = (5.4, 6.4)
+// Ekspresi: (10 * 5.4) + (15 * 6.4) - 100 = 54 + 96 - 100 = 150 - 100 = 50
+
+// ========================== CHART ==========================
+window.onload = function () {
+
+    function line1() {
+        const arr=[];
+        // Range x disesuaikan agar garis muncul
+        for(let x=0;x<=12;x+=0.5) arr.push({x,y:(30-2*x)/3});
+        return arr.filter(p=>p.y>=0);
+    }
+    function line2() {
+        const arr=[];
+        for(let x=0;x<=12;x+=0.5) arr.push({x,y:x+1});
+        return arr.filter(p=>p.y>=0);
+    }
+
+    new Chart(document.getElementById("splvChartSuperHots"), {
+        type: "line",
+        data: {
+            datasets: [
+                { label: "Garis A (2x+3y=30)", data: line1(), borderColor:"#f87171", borderWidth:3, pointRadius:0, fill:false },
+                { label: "Garis B (y=x+1)", data: line2(), borderColor:"#fbbf24", borderWidth:3, pointRadius:0, fill:false },
+                { label: "Solusi (5.4, 6.4)", data:[{x:5.4,y:6.4}], backgroundColor:"#10B981", pointRadius:8, type:'scatter' }
+            ]
+        },
+        // 🔥 KODE SCALES DITAMBAHKAN DI SINI 🔥
+        options:{
+            responsive:true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'linear', // PENTING: Untuk data {x, y} numerik
+                    min: 0,
+                    max: 10,
+                    title: { display: true, text: 'Kecepatan Awal (x)' }
+                },
+                y: {
+                    type: 'linear', // PENTING: Untuk data {x, y} numerik
+                    min: 0,
+                    max: 10,
+                    title: { display: true, text: 'Waktu Tempuh (y)' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+};
+
+// ========================== JAWABAN ==========================
+const kunciJawaban = "C"; // 50
+
+const miskonsepsiMap = {
+    A:"Terlalu kecil. Anda mungkin salah menghitung nilai x₀ atau y₀.",
+    B:"45 belum tepat. Cek kembali perhitungan nilai ekspresi (54 + 96 = 150).",
+    D:"55 terlalu besar. Cek perhitungan pengurangan 100."
+};
+
+// ================== SIMPAN LEVEL 3 ==================
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    let data = JSON.parse( sessionStorage.getItem("rekap_level3") || "null");
+    if (!data) data = { totalBenar: 0, totalSalah: 0, daftar: [] };
+
+    data.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    benar ? data.totalBenar++ : data.totalSalah++;
+ sessionStorage.setItem("rekap_level3", JSON.stringify(data));
+}
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+
+}
+
+// ========================== CEK JAWABAN ==========================
+function cekJawaban() {
+
+    const pilih = document.querySelector("input[name='jawaban']:checked");
+    const fb = document.getElementById("feedback");
+    fb.classList.remove("hidden");
+
+    if (!pilih) {
+        fb.className="mt-6 p-4 rounded-xl border border-yellow-500 bg-yellow-100";
+        fb.innerHTML="❗ Pilih jawaban dulu!";
+        return;
+    }
+
+    const ans = pilih.value;
+    const benar = ans === kunciJawaban;
+
+    if (benar) {
+        fb.className="mt-6 p-4 rounded-xl border border-green-500 bg-green-100";
+        fb.innerHTML =
+            "🧠 BENAR!<br>" +
+            "Solusi SPLDV: $x_0 = 5,4, y_0 = 6,4$.<br>" +
+            "Ekspresi: $(10 \\times 5,4) + (15 \\times 6,4) - 100 = 54 + 96 - 100 = 50$.";
+    } else {
+        fb.className="mt-6 p-4 rounded-xl border border-red-500 bg-red-100";
+        fb.innerHTML =
+            "❌ Belum tepat.<br>Miskonsepsi: <i>" +
+            (miskonsepsiMap[ans] || "Periksa SPLDV dan ekspresi akhir.") +
+            "</i>";
+    }
+// simpan hasil
+    simpanJawabanLevel3({
+        soalId: "lv3soal8",
+        benar,
+        jawaban: ans,
+        kunci: kunciJawaban
+    });
+
+    // update BN
+    updateBN("M7", benar);
+
+    document.querySelectorAll("input[name='jawaban']").forEach(e=>e.disabled=true);
+    document.querySelector("button[onclick='cekJawaban()']").disabled = true;
+
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ========================== NEXT ==========================
+function kesoal9() {
+    window.location.href = "lv3soal9.html";
+}
+</script>
+
+</body>
+</html>

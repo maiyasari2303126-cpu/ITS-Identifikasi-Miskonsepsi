@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Statistika SMP – Analisis Tren Naik Turun</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-teal-500 to-sky-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Dua Kurva Tren Penjualan</h1>
+            <p class="text-lg font-light">Menganalisis Kinerja Minuman A dan Minuman B</p>
+        </div>
+        <div class="text-5xl">☕️📈</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <!-- Grafik -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">Penjualan Minuman (Ribuan Cangkir)</h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="lineChartTren"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-teal-600 font-semibold text-center">
+                Sumbu Y: Penjualan (Ribuan Cangkir) | Sumbu X: Bulan ke-
+            </p>
+        </div>
+
+        <!-- Pertanyaan HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-cyan-50 border-2 border-cyan-400 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-blue-700 mb-4">Nomor 2</p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Minuman A mengalami <b>Penurunan Ekstrem</b> ketika nilai grafiknya turun. Hitunglah total selisih penurunan tersebut (T).
+                    <br><br>
+                    Lalu, hitung rata-rata nilai penjualan Minuman B pada bulan-bulan yang nilainya <b>lebih tinggi dari T</b>.
+                </p>
+
+                <!-- PILIHAN -->
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-100">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        <span>A. 15</span>
+                    </label>
+
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-100">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        <span>B. 16</span>
+                    </label>
+
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-100">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        <span>C. 18</span>
+                    </label>
+
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-100">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-teal-600 h-5 w-5 mr-4">
+                        <span>D. 20</span>
+                    </label>
+                </div>
+                
+                <!-- TOMBOL KIRIM -->
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-teal-600 text-white font-bold rounded-xl shadow-md hover:bg-teal-700">
+                   SUBMIT
+                </button>
+
+                <!-- FEEDBACK -->
+                <div id="feedback" 
+                     class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- NEXT BUTTON -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="keNomor3()" 
+                            class="w-full px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-md hover:bg-indigo-700">
+                        Nomor 3
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+// ===================== GRAFIK ======================
+window.onload = function() {
+    const dataA = [10, 15, 15, 20, 12, 22];
+    const dataB = [5, 10, 20, 20, 15, 25];
+
+    const ctx = document.getElementById('lineChartTren').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Bulan 1", "Bulan 2", "Bulan 3", "Bulan 4", "Bulan 5", "Bulan 6"],
+            datasets: [
+                {
+                    label: 'Minuman A',
+                    data: dataA,
+                    borderColor: 'rgb(16,185,129)',
+                    borderWidth: 4,
+                    tension: 0.2
+                },
+                {
+                    label: 'Minuman B',
+                    data: dataB,
+                    borderColor: 'rgb(251,146,60)',
+                    borderWidth: 4,
+                    tension: 0.2
+                }
+            ]
+        }
+    });
+};
+
+// ===================== CEK JAWABAN ======================
+const kunciJawaban = "C";
+const miskonsepsiMap = {
+    "A": "Mungkin Anda salah menghitung nilai T atau data B yang dipilih.",
+    "B": "Rata-rata yang dihitung belum tepat.",
+    "D": "Anda mengambil nilai tertinggi, bukan mean."
+};
+
+// Simpan hasil
+function simpanJawabanLevel2({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level2";
+    let r = JSON.parse( sessionStorage.getItem(KEY) || "{}");
+
+    if (!r.daftar) r = { totalBenar: 0, totalSalah: 0, daftar: [] };
+
+    r.daftar.push({
+        soalId, benar, jawaban, kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    if (benar) r.totalBenar++;
+    else r.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(r));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+// ===================== LOGIKA ======================
+function cekJawaban() {
+
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const f = document.getElementById("feedback");
+
+    if (!pilihan) {
+        f.className = "mt-6 p-4 border border-yellow-500 bg-yellow-100 rounded-xl text-yellow-800";
+        f.innerHTML = "❗ Pilih jawabannya dulu ya.";
+        f.classList.remove("hidden");
+        return;
+    }
+
+    const ans = pilihan.value;
+    const benar = ans === kunciJawaban;
+
+    if (benar) {
+        f.className = "mt-6 p-4 border border-green-500 bg-green-100 rounded-xl text-green-800";
+        f.innerHTML =
+            "🎉 <b>Benar!</b><br>" +
+            "T = 20 - 12 = 8.<br>" +
+            "Nilai B > 8: 10, 20, 20, 15, 25 → mean = <b>18</b>.";
+    } else {
+        f.className = "mt-6 p-4 border border-red-500 bg-red-100 rounded-xl text-red-800";
+        f.innerHTML =
+            "❌ Jawaban kurang tepat.<br>" +
+            "<i>" + miskonsepsiMap[ans] + "</i>";
+    }
+
+    f.classList.remove("hidden");
+
+    // simpan hasil
+    simpanJawabanLevel2({
+        soalId: "Nomor2",
+        benar,
+        jawaban: ans,
+        kunci: kunciJawaban
+    });
+
+    // update BN
+    updateBN("M9", benar);
+
+    // Disable radio
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // Tampilkan tombol lanjut
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ===================== PINDAH KE SOAL 3 ======================
+function keNomor3() {
+    window.location.href = "lv2soal3.html";
+}
+</script>
+
+</body>
+</html>

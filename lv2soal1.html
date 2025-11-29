@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITS – Grafik Kunjungan Kantin</title>
+
+  <!-- Tailwind & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-[#F2F4FF] min-h-screen flex items-center justify-center p-4">
+
+  <!-- KARTU UTAMA -->
+  <div class="max-w-3xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Nilai Siswa -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Analisis Hasil Ulangan Harian</h1>
+            <p class="text-lg font-light">Tantangan Modus, Median, dan Frekuensi Lanjutan</p>
+        </div>
+        <div class="text-5xl">
+        🧠💯
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <!-- Kolom Grafik Batang -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+              Distribusi Nilai Ulangan Siswa
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="barChartNilai"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-purple-600 font-semibold text-center">
+              Sumbu Y: Frekuensi | Sumbu X: Nilai
+            </p>
+        </div>
+
+        <!-- Kolom Pertanyaan HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-pink-700 mb-4">
+                    Nomor 1
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Grafik batang di samping menunjukkan hasil nilai ulangan matematika dari sekelompok siswa.
+                    <br><br>
+                    Jika Modus dari data nilai tersebut adalah <b>M</b> dan Mediannya adalah <b>N</b>, berapakah total frekuensi siswa yang nilainya berada <b>di atas nilai rata-rata (Mean)</b> dari Modus (M) dan Median (N) tersebut?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>A. 5 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>B. 7 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>C. 12 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>D. 15 siswa</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()"
+                        class="mt-8 w-full px-8 py-3 bg-purple-600 text-white font-bold rounded-xl shadow-md
+                               transition duration-300 transform hover:scale-[1.02] hover:bg-purple-700 active:scale-[0.98]">
+                    SUBMIT
+                </button>
+
+                <!-- FEEDBACK -->
+                <div id="feedback"
+                     class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300">
+                </div>
+
+                <!-- TOMBOL NEXT (FULL WIDTH) -->
+                <div id="nextBox" class="mt-6 hidden">
+                  <button
+                    onclick="keNomor2()"
+                    class="w-full px-8 py-3 bg-[#00897B] text-white font-bold rounded-xl shadow-lg
+                           hover:bg-[#00796B] transition duration-300 transform hover:scale-[1.02] active:scale-[0.97]">
+                    Nomor 2 
+                  </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+  </div>
+
+<script>
+// ====== DATA DAN GRAFIK ======
+window.onload = function() {
+    const dataNilai = {
+        labels: ['Nilai 5', 'Nilai 6', 'Nilai 7', 'Nilai 8', 'Nilai 9'],
+        counts: [3, 7, 10, 5, 2]
+    };
+
+    const ctx = document.getElementById('barChartNilai').getContext('2d');
+
+    const brightColors = [
+        'rgba(255, 99, 132, 0.9)',
+        'rgba(54, 162, 235, 0.9)',
+        'rgba(255, 206, 86, 0.9)',
+        'rgba(75, 192, 192, 0.9)',
+        'rgba(153, 102, 255, 0.9)'
+    ];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dataNilai.labels,
+            datasets: [{
+                data: dataNilai.counts,
+                backgroundColor: brightColors,
+                borderColor: brightColors.map(c => c.replace("0.9", "1")),
+                borderWidth: 1.5,
+                borderRadius: 8
+            }]
+        },
+        options: { responsive: true }
+    });
+};
+
+
+// ====== SISTEM CEK JAWABAN ======
+const kunciJawaban = "B";
+
+const miskonsepsiMap = {
+    "A": "Anda hanya menjumlahkan nilai 8 saja.",
+    "C": "Anda menjumlahkan frekuensi yang salah.",
+    "D": "Anda menghitung nilai ≥ 7, bukan nilai > rata-rata."
+};
+
+
+// ====== SIMPAN JEJAK JAWABAN (LEVEL 2) ======
+function simpanJawabanLevel2({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level2";   // ← LEVEL 2
+
+    let rekap = JSON.parse(sessionStorage.getItem(KEY) || "null") || {
+        totalBenar: 0,
+        totalSalah: 0,
+        daftar: []
+    };
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+    sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse(sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4,
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== FUNGSI CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+
+    if (!pilihan) {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Pilih jawaban dulu ya!";
+        feedbackDiv.classList.remove("hidden");
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = (answer === kunciJawaban);
+
+    if (benar) {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🎉 Jawaban BENAR! Modus = 7, Median = 7, nilai di atas rata-rata (7) = 7 siswa.";
+    } else {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Kurang tepat! " + (miskonsepsiMap[answer] || "");
+    }
+
+    feedbackDiv.classList.remove("hidden");
+
+    // disable semua pilihan
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // simpan → PAKAI LEVEL 2 + ID LEVEL 2
+    simpanJawabanLevel2({
+        soalId: "Nomor1",
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // 🔥 update BN
+    updateBN("M1", benar);
+
+    // tampilkan tombol next
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+
+// ====== PINDAH KE SOAL 2 ======
+function keNomor2() {
+    // pastikan nama file sesuai dengan file soal 2 milikmu
+    window.location.href = "lv2soal2.html";
+}
+</script>
+
+</body>
+</html>

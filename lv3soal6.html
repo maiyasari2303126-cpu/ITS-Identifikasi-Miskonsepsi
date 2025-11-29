@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kuis HOTS Level 3 – Soal 6: Interpretasi Diagram Lingkaran</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-cyan-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-blue-400 via-cyan-500 to-green-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Level 3 – Soal 6</h1>
+            <p class="text-lg font-light">Interpretasi Diagram Lingkaran</p>
+        </div>
+        <div class="text-5xl">🎨🌈</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col   gap-8">
+        
+        <!-- Grafik Lingkaran -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Distribusi Warna Favorit Siswa
+            </h2>
+
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner chart-container">
+                <canvas id="pieChartSuperHots"></canvas>
+            </div>
+
+            <div class="mt-4 p-3 bg-blue-100 rounded-lg text-sm text-blue-700 font-medium w-full">
+                Petunjuk: Sudut sektor Biru adalah 108° (30% dari lingkaran). Jumlah total siswa belum diketahui.
+            </div>
+        </div>
+
+        <!-- Soal -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-yellow-100 border-2 border-yellow-500 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-cyan-700 mb-4">
+                    Nomor 6
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Diagram lingkaran menunjukkan persentase warna favorit siswa:
+                    <ul class="list-disc list-inside ml-4 space-y-1 mt-4">
+                        <li>Merah (M): 25%</li>
+                        <li>Kuning (K): 15%</li>
+                        <li>Biru (B): 108°</li>
+                        <li>Ungu (U): 10%</li>
+                        <li>Hijau (H): sisanya</li>
+                    </ul>
+                    <br>
+                    Clue: <span class="font-bold text-red-600">
+                        Jumlah siswa yang memilih Merah adalah 30 siswa lebih banyak daripada yang memilih Hijau.
+                    </span>
+                    <br><br>
+                    Hitung nilai:
+                    <br>
+                    <b>(Jumlah siswa Kuning + Ungu) ÷ (Selisih siswa Biru dan Merah)</b>
+                </p>
+
+                <!-- Opsi Jawaban -->
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-cyan-600 h-5 w-5 mr-4" />
+                        <span>A. 3</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-cyan-600 h-5 w-5 mr-4" />
+                        <span>B. 5</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-cyan-600 h-5 w-5 mr-4" />
+                        <span>C. 10</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-cyan-600 h-5 w-5 mr-4" />
+                        <span>D. 15</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-cyan-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-cyan-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- Tombol Lanjut -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal7()"
+                            class="w-full px-6 py-3 rounded-xl bg-cyan-700 text-white font-bold shadow-md hover:bg-cyan-800">
+                        Nomor 7  
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================== GRAFIK LINGKARAN ==================
+window.onload = function () {
+    // Merah: 25%, Kuning: 15%, Biru: 30%, Ungu: 10%, Hijau: 20%
+    const persentaseData = [25, 15, 30, 10, 20];
+    const kategoriLabels = [
+        "Merah (25%)",
+        "Kuning (15%)",
+        "Biru (30%)",
+        "Ungu (10%)",
+        "Hijau (20%)",
+    ];
+
+    const ctx = document
+        .getElementById("pieChartSuperHots")
+        .getContext("2d");
+
+    const backgroundColors = [
+        "#EF4444",
+        "#FBBF24",
+        "#3B82F6",
+        "#9333EA",
+        "#10B981",
+    ];
+
+    new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: kategoriLabels,
+            datasets: [
+                {
+                    label: "Persentase Siswa",
+                    data: persentaseData,
+                    backgroundColor: backgroundColors,
+                    hoverOffset: 12,
+                    borderColor: "#ffffff",
+                    borderWidth: 2,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: { font: { size: 14 } },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.label || "";
+                            if (label) label += ": ";
+                            if (context.parsed !== null)
+                                label += context.parsed + "%";
+                            return label;
+                        },
+                    },
+                },
+                title: {
+                    display: true,
+                    text: "Distribusi Warna Favorit Siswa",
+                    font: { weight: "bold" },
+                },
+            },
+        },
+    });
+};
+
+// ================== PENJELASAN MATEMATIS (KOMENTAR) ==================
+/*
+1. Biru (B) dari sudut:
+   108° / 360° × 100% = 30%.
+
+2. Total persen diketahui:
+   Merah 25 + Kuning 15 + Biru 30 + Ungu 10 = 80%.
+   Hijau (H) = 100 - 80 = 20%.
+
+3. Clue:
+   M - H = 30 siswa.
+   25%T - 20%T = 30  →  5%T = 30  →  T = 30 / 0.05 = 600 siswa.
+
+4. Jumlah siswa:
+   Kuning: 15% × 600 = 90
+   Ungu:   10% × 600 = 60
+   Biru:   30% × 600 = 180
+   Merah:  25% × 600 = 150
+
+5. Ekspresi:
+   (K + U) / (B - M) = (90 + 60) / (180 - 150) = 150 / 30 = 5.
+*/
+
+const kunciJawaban = "B"; // 5
+
+const miskonsepsiMap = {
+    A: "Angka 3 terlalu kecil. Kemungkinan salah pada selisih Biru − Merah atau salah menentukan total siswa (harusnya 600).",
+    C: "Angka 10 terlalu besar. Periksa lagi (K + U) dan (B − M).",
+    D: "Angka 15 terlalu besar. Mungkin Anda langsung memakai persentase tanpa mengubah ke jumlah siswa."
+};
+
+// ================== SIMPAN HASIL LEVEL 3 ==================
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    let data = JSON.parse( sessionStorage.getItem("rekap_level3") || "null");
+    if (!data) data = { totalBenar: 0, totalSalah: 0, daftar: [] };
+
+    data.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    if (benar) data.totalBenar++;
+    else data.totalSalah++;
+
+     sessionStorage.setItem("rekap_level3", JSON.stringify(data));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+// ================== CEK JAWABAN ==================
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove("hidden");
+
+    if (!pilihan) {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML =
+            "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🧠 Jawaban BENAR!<br>" +
+            "Total siswa = 600, Kuning = 90, Ungu = 60, Biru = 180, Merah = 150.<br>" +
+            "Ekspresi = (90 + 60) / (180 − 150) = 150 / 30 = <b>5</b>.";
+    } else {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Analisis belum tepat.<br>" +
+            "Periksa lagi langkah: konversi sudut Biru → 30%, cari Hijau → 20%, total siswa → 600, lalu hitung rasio.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] ||
+                "Ada kesalahan pada konversi persen ke jumlah siswa atau pada rasio akhir.") +
+            "</i>";
+    }
+
+    // Simpan hasil ke rekap_level3
+    simpanJawabanLevel3({
+        soalId: "lv3soal6",
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // Update BN untuk node interpretasi diagram lingkaran
+    updateBN("M5", benar);
+
+    // Kunci opsi setelah menjawab
+    document
+        .querySelectorAll('input[name="jawaban"]')
+        .forEach((el) => (el.disabled = true));
+
+    // Tampilkan tombol next
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ================== LANJUT KE SOAL 7 ==================
+function kesoal7() {
+    window.location.href = "lv3soal7.html";
+}
+</script>
+
+</body>
+</html>

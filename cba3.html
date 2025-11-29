@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pilih Level Kuis ITS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body{
+        margin:0;
+        font-family:"Poppins",sans-serif;
+        background:#eef3ff;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        min-height:100vh;
+        padding:20px;
+    }
+
+    .wrapper{
+        background:#fff;
+        width:90%;
+        max-width:900px;
+        padding:35px 25px;
+        border-radius:25px;
+        text-align:center;
+        box-shadow:0 15px 40px rgba(0,0,0,.12);
+    }
+
+    h1{
+        font-size:2rem;
+        margin-bottom:10px;
+        color:#1b2a4a;
+    }
+
+    .subtitle{
+        margin-bottom:25px;
+        color:#5c6f91;
+    }
+
+    .levels{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:24px;
+    }
+
+    .level-card{
+        background:#f8faff;
+        border-radius:22px;
+        padding:22px 20px;
+        text-align:left;
+        border:2px solid transparent;
+        transition:.25s;
+        box-shadow:0 10px 25px rgba(0,0,0,.06);
+    }
+
+    .level-card:hover{
+        transform:translateY(-5px);
+        border-color:#2962ff;
+    }
+
+    .level-card h2{
+        font-size:1.2rem;
+        margin-bottom:10px;
+        color:#1d2d50;
+    }
+
+    .level-card p{
+        font-size:.9rem;
+        color:#687a9c;
+        margin-bottom:15px;
+        line-height:1.45;
+    }
+
+    .btn-level{
+        padding:10px 16px;
+        display:inline-block;
+        background:#2962ff;
+        color:#fff;
+        border-radius:10px;
+        text-decoration:none;
+        font-weight:600;
+        transition:.2s;
+        cursor:pointer;
+    }
+
+    .btn-level:hover{
+        background:#174bcc;
+    }
+
+    .locked{
+        opacity:.4;
+        cursor:not-allowed !important;
+        pointer-events:none;
+    }
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+    <h1>Pilih Tingkat Kesulitan</h1>
+    <p class="subtitle">Latihan diagram batang, garis, dan lingkaran dengan tiga tingkat tantangan!</p>
+
+    <div class="levels">
+        
+        <!-- LEVEL 1 -->
+        <div class="level-card">
+            <h2>🌱 Level 1 </h2>
+            <p>Mulai dari yang ringan! Diagramnya masih simple dan jawabannya gampang ditemukan.</p>
+            <a id="btnLevel1" href="lv1soal1.html" class="btn-level">Mulai Level 1 →</a>
+        </div>
+
+        <!-- LEVEL 2 -->
+        <div class="level-card" id="card2">
+            <h2>🚀 Level 2 </h2>
+            <p>Masih diagram yang sama, tapi lebih tricky! Fokus pada perubahan dan perbandingan data.</p>
+            <a id="btnLevel2" class="btn-level locked">🔒 Terkunci</a>
+        </div>
+
+        <!-- LEVEL 3 -->
+        <div class="level-card" id="card3">
+            <h2>👑 Level 3 </h2>
+            <p>Babak final! Diagram sama, tapi soalnya jauh lebih menantang dan membutuhkan logika kuat.</p>
+            <a id="btnLevel3" class="btn-level locked">🔒 Terkunci</a>
+        </div>
+
+    </div>
+
+    <p style="margin-top:18px;">
+        <a href="tampilan.html" style="color:#2962ff; text-decoration:none;">← Kembali ke Beranda</a>
+    </p>
+
+</div>
+
+<!-- ============================================
+        🔐 SISTEM KUNCI LEVEL DENGAN sessionStorage
+   ============================================ -->
+<script>
+  function initLevelLock() {
+    const btnLv1 = document.getElementById("btnLevel1");
+    const btnLv2 = document.getElementById("btnLevel2");
+    const btnLv3 = document.getElementById("btnLevel3");
+
+    // Level 1 selalu aktif
+    if (btnLv1) {
+      btnLv1.href = "lv1soal1.html";
+    }
+
+    // Baca status kelulusan dari sessionStorage
+    const lv1Done = sessionStorage.getItem("level1_selesai") === "true";
+    const lv2Done = sessionStorage.getItem("level2_selesai") === "true";
+
+    // ====== LEVEL 2 ======
+    if (btnLv2) {
+      if (lv1Done) {
+        btnLv2.classList.remove("locked");
+        btnLv2.textContent = "Mulai Level 2 →";
+        btnLv2.href = "lv2soal1.html";
+      } else {
+        btnLv2.classList.add("locked");
+        btnLv2.removeAttribute("href");
+        btnLv2.textContent = "🔒 Terkunci (Selesaikan Level 1)";
+      }
+    }
+
+    // ====== LEVEL 3 ======
+    if (btnLv3) {
+      if (lv2Done) {
+        btnLv3.classList.remove("locked");
+        btnLv3.textContent = "Mulai Level 3 →";
+        btnLv3.href = "lv3soal1.html";
+      } else {
+        btnLv3.classList.add("locked");
+        btnLv3.removeAttribute("href");
+        btnLv3.textContent = "🔒 Terkunci (Selesaikan Level 2)";
+      }
+    }
+  }
+
+  // Jalankan setelah DOM siap
+  window.addEventListener("DOMContentLoaded", initLevelLock);
+</script>
+
+</body>
+</html>

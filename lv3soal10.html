@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 3 – Soal 10 | Analisis Statistika Lengkap</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+
+<body class="bg-teal-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-pink-400 via-yellow-400 to-teal-400 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Level 3 – Soal 10</h1>
+            <p class="text-lg font-light">Pesta Es Krim Ceria: Distribusi Usia Peserta</p>
+        </div>
+        <div class="text-5xl">🍦</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col  gap-8">
+        
+        <!-- Grafik -->
+        <div class="lg:w-full">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2">Frekuensi Usia Peserta</h2>
+            <div class="w-full h-64 md:h-80 bg-gray-50 rounded-xl p-4 shadow-inner flex items-center justify-center">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pertanyaan -->
+        <div class="lg:w-full">
+            <div class="p-6 bg-teal-100 border-2 border-teal-500 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-pink-700 mb-4">Nomor 10</p>
+
+                <p class="text-lg text-gray-800 mb-6">
+                    Hitung: <b>Mean (x̄)</b>, <b>Median (Me)</b>, dan <b>Range (R)</b> dari data grafik usia.
+                    <br><br>
+                    Nilai akhir yang harus dihitung:
+                    <br>
+                    <b>(10 × x̄) + (15 × Me) − (10 × R)</b>
+                </p>
+
+                <!-- Pilihan Jawaban -->
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center bg-white p-3 rounded-lg shadow hover:bg-teal-200">
+                        <input type="radio" name="jawaban" value="A" class="mr-4"> A. 290
+                    </label>
+                    <label class="flex items-center bg-white p-3 rounded-lg shadow hover:bg-teal-200">
+                        <input type="radio" name="jawaban" value="B" class="mr-4"> B. 300
+                    </label>
+                    <label class="flex items-center bg-white p-3 rounded-lg shadow hover:bg-teal-200">
+                        <input type="radio" name="jawaban" value="C" class="mr-4"> C. 310
+                    </label>
+                    <label class="flex items-center bg-white p-3 rounded-lg shadow hover:bg-teal-200">
+                        <input type="radio" name="jawaban" value="D" class="mr-4"> D. 320
+                    </label>
+                </div>
+
+                <button onclick="cekJawaban()" class="mt-6 w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow">
+                    SUBMIT
+                </button>
+
+                <div id="feedback" class="hidden mt-6 p-4 rounded-xl text-md font-semibold border"></div>
+
+                <!-- TOMBOL KE HALAMAN HASIL LEVEL 3 -->
+                <div id="nextBox" class="hidden mt-6">
+                    <button onclick="keHasilLevel3()" 
+                        class="w-full py-3 bg-pink-600 text-white font-bold rounded-xl shadow hover:bg-pink-700">
+                         Lihat Hasil Level 3
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// ------------------ GRAFIK -------------------
+window.onload = function() {
+    const ctx = document.getElementById('barChart');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Usia 12', 'Usia 13', 'Usia 14', 'Usia 15', 'Usia 16'],
+            datasets: [{
+                data: [4, 8, 16, 8, 4],
+                backgroundColor: ['#F472B6','#FBBF24','#34D399','#FBBF24','#F472B6'],
+                borderRadius: 8
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+};
+
+// ------------------ KUNCI & MISKONSEPSI -------------------
+const kunciJawaban = "C";
+
+const miskonsepsiMap = {
+    "A": "Mean atau Median dihitung terlalu kecil.",
+    "B": "Anda lupa mengurangkan 10 × R.",
+    "D": "Angka terlalu besar, kesalahan penjumlahan."
+};
+
+// ------------------ SIMPAN REKAP LEVEL 3 -------------------
+function simpanLevel3({ soalId, benar, jawaban, kunci }) {
+    let data = JSON.parse( sessionStorage.getItem("rekap_level3") || "null");
+    if (!data) data = { totalBenar: 0, totalSalah: 0, daftar: [] };
+
+    data.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    if (benar) data.totalBenar++;
+    else data.totalSalah++;
+
+     sessionStorage.setItem("rekap_level3", JSON.stringify(data));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ------------------ CEK JAWABAN -------------------
+function cekJawaban() {
+    const pilihan = document.querySelector("input[name='jawaban']:checked");
+    const fb = document.getElementById("feedback");
+    fb.classList.remove("hidden");
+
+    if (!pilihan) {
+        fb.className = "mt-6 p-4 rounded-xl border bg-yellow-100 text-yellow-800";
+        fb.innerHTML = "⚠️ Silakan pilih jawaban dahulu.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = (answer === kunciJawaban);
+
+    if (benar) {
+        fb.className = "mt-6 p-4 rounded-xl border border-green-500 bg-green-100 text-green-800";
+        fb.innerHTML =
+            "🎉 Jawaban BENAR!<br>Mean = 14, Median = 14, Range = 4.<br>Hasil akhir = <b>310</b>";
+    } else {
+        fb.className = "mt-6 p-4 rounded-xl border border-red-500 bg-red-100 text-red-800";
+        fb.innerHTML =
+            "❌ Jawaban SALAH.<br>" +
+            "<i>" + miskonsepsiMap[answer] + "</i>";
+    }
+
+    // SIMPAN REKAP & UPDATE BN
+    simpanLevel3({
+        soalId: "lv3soal10",
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    updateBN("M8", benar);
+
+    // Kunci radio button
+    document.querySelectorAll("input[name='jawaban']").forEach(el => el.disabled = true);
+
+    // Tampilkan tombol menuju hasil Level 3
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ------------------ NAVIGASI -------------------
+function keHasilLevel3() {
+    window.location.href = "hasillevel3.html";
+}
+</script>
+
+</body>
+</html>

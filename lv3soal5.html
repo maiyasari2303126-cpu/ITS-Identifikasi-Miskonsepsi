@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kuis HOTS Level 3 – Soal 5: Penentuan Gradien Ganda</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Konfigurasi MathJax untuk LaTeX inline: $ ... $ -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        }
+      };
+    </script>
+    <script id="MathJax-script"
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+            async>
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { width: 100%; height: 100%; }
+    </style>
+</head>
+
+<body class="bg-fuchsia-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <div class="p-6 md:p-8 bg-gradient-to-r from-pink-500 via-fuchsia-600 to-purple-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Level 3 – Soal 5</h1>
+            <p class="text-lg font-light">Penentuan Gradien Ganda</p>
+        </div>
+        <div class="text-5xl">🏎️🏁</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Visualisasi Garis L1 (Jalur Utama)
+            </h2>
+
+            <div class="w-full h-64 md:h-80 bg-gray-50 rounded-xl p-4 shadow-inner chart-container">
+                <canvas id="lineChartSuperHots"></canvas>
+            </div>
+
+            <div class="mt-4 p-3 bg-pink-100 rounded-lg text-sm text-pink-700 font-medium w-full">
+                Garis L1 melalui titik P(2, 8) dan Q(6, 4).
+            </div>
+        </div>
+
+        <div class="lg:w-full">
+            <div class="p-6 bg-purple-100 border-2 border-purple-500 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-fuchsia-700 mb-4">
+                    Nomor 5
+                </p>
+
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Tiga garis memiliki gradien m1, m2, dan m3:
+                <ul class="list-decimal ml-4 space-y-1 mt-3">
+                    <li>L1 : melalui P(2, 8) dan Q(6, 4) → tentukan m1.</li>
+                    <li>L2 : tegak lurus L1 → tentukan m2.</li>
+                    <li>L3 : sejajar L2 → tentukan m3.</li>
+                </ul>
+                <br>
+                Hitung nilai ekspresi:
+                <br>
+                <b>(2·m3) + (3·m2) − (4·m1)</b>
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-200 transition">
+                        <input type="radio" name="jawaban" value="A" class="mr-4 h-5 w-5"> A. 6
+                    </label>
+
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-200 transition">
+                        <input type="radio" name="jawaban" value="B" class="mr-4 h-5 w-5"> B. 9
+                    </label>
+
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-200 transition">
+                        <input type="radio" name="jawaban" value="C" class="mr-4 h-5 w-5"> C. 12
+                    </label>
+
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-200 transition">
+                        <input type="radio" name="jawaban" value="D" class="mr-4 h-5 w-5"> D. 15
+                    </label>
+                </div>
+
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-fuchsia-600 text-white font-bold rounded-xl shadow-md hover:scale-[1.02] hover:bg-fuchsia-700">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden"></div>
+
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal6()"
+                            class="w-full px-6 py-3 rounded-xl bg-purple-600 text-white font-bold shadow-md hover:bg-purple-700">
+                       Nomor 6  
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================= GRAPH L1 =================
+window.onload = function () {
+    const ctxElement = document.getElementById("lineChartSuperHots");
+    if (!ctxElement) return; // Exit if canvas element not found
+
+    const ctx = ctxElement.getContext("2d");
+
+    // Fungsi untuk menghasilkan titik garis y = -x + 10
+    const pointsL1 = () => {
+        const t = [];
+        // Menggambar garis yang lebih panjang dari 0-10 untuk visualisasi yang lebih baik
+        for (let x = -2; x <= 12; x += 0.5) {
+            t.push({ x: x, y: -x + 10 });
+        }
+        return t;
+    };
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            datasets: [
+                {
+                    label: "L1 (m=-1)",
+                    data: pointsL1(),
+                    borderColor: "#EC4899", // Pink
+                    borderWidth: 4,
+                    pointRadius: 0,
+                    showLine: true,
+                    fill: false,
+                },
+                {
+                    label: "Titik P(2,8) & Q(6,4)",
+                    data: [
+                        { x: 2, y: 8 },
+                        { x: 6, y: 4 }
+                    ],
+                    backgroundColor: "#3B82F6", // Blue
+                    pointRadius: 7,
+                    showLine: false,
+                    type: 'scatter'
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'linear',
+                    min: 0,
+                    max: 10,
+                    title: { display: true, text: 'Koordinat X' },
+                    grid: { drawOnChartArea: true }
+                },
+                y: {
+                    type: 'linear',
+                    min: 0,
+                    max: 10,
+                    title: { display: true, text: 'Koordinat Y' },
+                    grid: { drawOnChartArea: true }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+};
+
+// ================= KUNCI & PERHITUNGAN =================
+/*
+Perhitungan:
+m1 = (4 - 8) / (6 - 2) = -4 / 4 = -1
+m2 (Tegak Lurus L1) = -1 / m1 = -1 / -1 = 1
+m3 (Sejajar L2) = m2 = 1
+Ekspresi: (2*1) + (3*1) - (4*-1) = 2 + 3 + 4 = 9
+*/
+const kunciJawaban = "B"; // 9
+
+const miskonsepsiMap = {
+    A: "Miskonsepsi pada operasi tanda negatif: Ekspresi akhir seharusnya 5 - (-4) = 9, bukan 5 - 4 = 1.",
+    C: "Anda mungkin salah menghitung m2 atau m3, atau ada kesalahan dalam substitusi ke ekspresi.",
+    D: "Kesalahan pada aturan tegak lurus (m1 × m2 = -1) atau sejajar (m2 = m3)."
+};
+
+// ================== SIMPAN LEVEL 3 ==================
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    let data = JSON.parse( sessionStorage.getItem("rekap_level3") || "null");
+    if (!data) data = { totalBenar: 0, totalSalah: 0, daftar: [] };
+
+    data.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    benar ? data.totalBenar++ : data.totalSalah++;
+
+     sessionStorage.setItem("rekap_level3", JSON.stringify(data));
+}
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4,
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ============= CEK JAWABAN =============
+function cekJawaban() {
+    const pilih = document.querySelector('input[name="jawaban"]:checked');
+    const fb = document.getElementById("feedback");
+    fb.classList.remove("hidden");
+
+    if (!pilih) {
+        fb.className = "mt-6 p-4 rounded-xl border bg-yellow-100 border-yellow-500 text-yellow-800";
+        fb.innerHTML = "❗ Pilih jawaban dulu.";
+        if (window.MathJax) MathJax.typesetPromise([fb]);
+        return;
+    }
+
+    const ans = pilih.value;
+    const benar = ans === kunciJawaban;
+
+    if (benar) {
+        fb.className = "mt-6 p-4 rounded-xl border bg-green-100 border-green-500 text-green-800";
+        fb.innerHTML = `
+            ✅ <b>Benar!</b><br>
+            • $\\mathbf{m1}$ = $\\frac{4-8}{6-2} = -1$<br>
+            • $\\mathbf{m2}$ (Tegak Lurus) = $-1/m1 = 1$<br>
+            • $\\mathbf{m3}$ (Sejajar) = $m2 = 1$<br>
+            • Ekspresi = $(2 \\times 1) + (3 \\times 1) - (4 \\times -1) = 2 + 3 + 4 = 9$
+        `;
+    } else {
+        fb.className = "mt-6 p-4 rounded-xl border bg-red-100 border-red-500 text-red-800";
+        fb.innerHTML = `
+            ❌ Jawaban salah.<br>
+            Periksa kembali tiga langkah: 1) Hitung m1, 2) Tentukan m2 dan m3 berdasarkan relasi, 3) Substitusi ke ekspresi.<br>
+            Miskonsepsi terdeteksi: <i>${miskonsepsiMap[ans] || "Kesalahan perhitungan gradien atau ekspresi."}</i>
+        `;
+    }
+
+    // Render LaTeX pada feedback
+    if (window.MathJax) {
+        MathJax.typesetPromise([fb]);
+    }
+
+    // simpan hasil
+    simpanJawabanLevel3({
+        soalId: "lv3soal5",
+        benar,
+        jawaban: ans,
+        kunci: kunciJawaban
+    });
+
+    // update BN
+    updateBN("M4", benar);
+
+    document.querySelectorAll('input[name="jawaban"]').forEach(i => i.disabled = true);
+    document.querySelector('button[onclick="cekJawaban()"]').disabled = true;
+
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ============= LANJUT SOAL 6 =============
+function kesoal6() {
+    window.location.href = "lv3soal6.html";
+}
+</script>
+
+</body>
+</html>

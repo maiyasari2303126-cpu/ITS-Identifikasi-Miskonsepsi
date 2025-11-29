@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Kelas 9 – Analisis Grafik Batang Statistik (Level 3)</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-yellow-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Taman Ceria -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-orange-400 via-pink-500 to-yellow-400 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Misteri Bintang Kepuasan Taman Ceria</h1>
+            <p class="text-lg font-light">Tentukan A dan B dari Mean dan Frekuensi</p>
+        </div>
+        <div class="text-5xl">
+            ⭐🌈
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col  gap-8">
+        
+        <!-- Kolom Grafik Batang (Data Kepuasan Bintang) -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Frekuensi Rating Bintang (A & B Hilang)
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner chart-container">
+                <canvas id="barChartSuperHots"></canvas>
+            </div>
+            <div class="mt-4 p-3 bg-pink-100 rounded-lg text-sm text-pink-700 font-medium w-full">
+                Rating 7 Bintang memiliki frekuensi A. Rating 9 Bintang memiliki frekuensi B.
+            </div>
+        </div>
+
+        <!-- Kolom Pertanyaan SUPER HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-yellow-100 border-2 border-yellow-500 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-orange-700 mb-4">
+                    Nomor 1
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Grafik batang menunjukkan rating (Nilai) kepuasan pengunjung (dalam Bintang) dengan frekuensi pengunjung yang diketahui: 
+                    <ul class="list-disc list-inside ml-4 space-y-1 mt-4">
+                        <li>Rating 6: 10 pengunjung</li>
+                        <li>Rating 8: 12 pengunjung</li>
+                        <li>Rating 10: 8 pengunjung</li>
+                    </ul>
+                    Data keseluruhan memiliki total 55 pengunjung. Anda harus menemukan A (Frek. 7) dan B (Frek. 9) dengan clue:
+                    <br>
+                    <span class="font-bold text-red-600">Mean (Rata-rata) dari seluruh data adalah 7.8</span>
+                    <br><br>
+                    Setelah A dan B ditemukan, hitunglah nilai dari ekspresi berikut: 
+                    <br>
+                    <b>(Range Frekuensi × Modus Nilai) ÷ (Frekuensi Nilai 7 − Frekuensi Nilai 9)</b>
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-orange-600 h-5 w-5 mr-4">
+                        <span>A. 4</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-orange-600 h-5 w-5 mr-4">
+                        <span>B. 6</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-orange-600 h-5 w-5 mr-4">
+                        <span>C. 8</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-orange-600 h-5 w-5 mr-4">
+                        <span>D. 10</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-orange-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- TOMBOL LANJUT KE SOAL 2 LEVEL 3 -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal2()" 
+                            class="w-full px-6 py-3 rounded-xl bg-amber-600 text-white font-bold shadow-md hover:bg-amber-700 transition">
+                        Nomor 2  
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK BATANG ======
+window.onload = function() {
+    // Solusi didesain: A=16, B=9. N_Total = 55. Mean=7.8
+    const frekuensiData = [10, 16, 12, 9, 8]; 
+    const nilaiLabels   = [6, 7, 8, 9, 10];
+    
+    const ctx = document.getElementById('barChartSuperHots').getContext('2d');
+    
+    const backgroundColors = [
+        '#FBBF24', // 6
+        '#EF4444', // 7 (A, modus)
+        '#10B981', // 8
+        '#3B82F6', // 9 (B)
+        '#EC4899'  // 10
+    ];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: nilaiLabels.map(n => `Rating ${n}`),
+            datasets: [{
+                label: 'Jumlah Pengunjung (Frekuensi)',
+                data: frekuensiData,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors,
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Distribusi Rating Kepuasan (N = 55)',
+                    font: { weight: 'bold' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 18,
+                    title: {
+                        display: true,
+                        text: 'Frekuensi Pengunjung'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Nilai Rating Bintang'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ====== PENALARAN MATEMATIS (RINGKAS) ======
+/*
+Total frekuensi: 10 + A + 12 + B + 8 = 55 → A + B = 25
+Total nilai: 6·10 + 7·A + 8·12 + 9·B + 10·8 = 429 (karena mean 7,8 × 55)
+→ 60 + 7A + 96 + 9B + 80 = 429 → 7A + 9B = 193
+
+Dari A + B = 25 → B = 25 − A
+Substitusi: 7A + 9(25 − A) = 193 → 7A + 225 − 9A = 193
+→ −2A = −32 → A = 16, B = 9
+
+Frekuensi: 10, 16, 12, 9, 8
+Range frekuensi: 16 − 8 = 8
+Modus nilai: 7 (frekuensi tertinggi 16)
+A − B = 16 − 9 = 7
+
+Ekspresi: (Range × Modus) ÷ (A − B) = (8 × 7) ÷ 7 = 8
+*/
+const kunciJawaban = "C"; // 8
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin salah menentukan range frekuensi (harusnya 16 − 8 = 8) atau salah memilih modus (harusnya nilai 7).", 
+    "B": "Cek lagi sistem persamaan: A + B = 25 dan 7A + 9B = 193, yang seharusnya memberi A = 16 dan B = 9.",
+    "D": "Angka 10 terlalu besar; biasanya muncul jika range dianggap 10 atau salah hitung selisih A − B."
+};
+
+// ====== SIMPAN JAWABAN LEVEL 3 ======
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level3";              // ⬅️ bedanya: sekarang pakai rekap_level3
+    let rekap = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!rekap) {
+        rekap = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan     = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar  = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🧠 Kunci Jawaban Benar!<br>" +
+            "1. Dari mean 7,8 dan total 55 pengunjung, diperoleh A = 16 dan B = 9 melalui sistem persamaan linier.<br>" +
+            "2. Range frekuensi = 16 − 8 = 8, modus nilai = 7 (frekuensi tertinggi).<br>" +
+            "3. A − B = 16 − 9 = 7.<br>" +
+            "4. Nilai ekspresi = (8 × 7) ÷ 7 = <b>8</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Statistik Ganda Kurang Tepat!<br>" +
+            "Pastikan: 1) A + B = 25 dan 7A + 9B = 193, 2) diperoleh A = 16 dan B = 9, 3) Range = 8, Modus = 7, dan A − B = 7.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kemungkinan salah menyelesaikan sistem persamaan untuk A dan B atau salah menghitung ekspresinya.") +
+            "</i>";
+    }
+
+    // Simpan hasil ke LEVEL 3
+    simpanJawabanLevel3({
+        soalId: "lv3soal1",   // ⬅️ soal 1 level 3
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // Update BN node M7
+    updateBN("M6", benar);
+
+    // Disable pilihan
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // Tampilkan tombol lanjut
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====== PINDAH KE SOAL 2 LEVEL 3 ======
+function kesoal2() {
+    // ⬅️ pastikan nama file soal 2 level 3 sesuai
+    window.location.href = "lv3soal2.html";
+}
+</script>
+
+</body>
+</html>

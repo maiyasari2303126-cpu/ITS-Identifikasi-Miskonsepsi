@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materi – Representasi Data dan Grafik (SMP)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .slide {
+      display: none;
+      opacity: 0;
+    }
+
+    .slide.active {
+      display: block;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .chart-box {
+      width: 260px;
+      height: 180px;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-slate-200 min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-3xl w-full bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-6 md:p-8 border border-slate-100 transform transition hover:-translate-y-1 hover:shadow-[0_25px_60px_rgba(15,23,42,0.25)]">
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-extrabold text-sky-700 text-center tracking-tight">
+        Representasi Data dan Grafik – SMP
+      </h1>
+      <p class="text-center text-gray-600 mt-2 text-sm md:text-base">
+        Modul materi ringkas untuk memahami data, tabel, dan berbagai jenis grafik. 
+        <span class="block md:inline">Tanpa soal latihan, siap dipakai di Intelligent Tutoring System.</span>
+      </p>
+    </div>
+
+    <!-- Info slide -->
+    <div class="mb-4 flex items-center justify-between text-xs md:text-sm text-gray-500">
+      <span id="modul-title" class="font-semibold text-sky-700">
+        Modul Materi ITS
+      </span>
+      <span id="slide-indicator" class="px-2 py-1 rounded-full bg-sky-50 border border-sky-100">
+        Slide 1 dari 8
+      </span>
+    </div>
+
+    <!-- SLIDES -->
+    <div id="slides-wrapper" class="min-h-[260px] md:min-h-[280px]">
+      
+      <!-- SLIDE 1: Pengantar -->
+      <section class="slide active" data-slide="1">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          1. Pengantar: Apa itu Representasi Data dan Grafik?
+        </h2>
+        <p class="text-gray-700 mb-3">
+          Dalam kehidupan sehari-hari, kita sering menjumpai informasi dalam bentuk angka dan gambar, 
+          misalnya jumlah pengunjung kantin, nilai ulangan, atau minat ekstrakurikuler. 
+          Informasi seperti ini disebut <span class="font-semibold">data</span>.
+        </p>
+        <p class="text-gray-700 mb-3">
+          <span class="font-semibold">Representasi data</span> adalah cara menyajikan data sehingga 
+          lebih mudah dibaca dan dipahami. Representasi ini dapat berupa:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1">
+          <li><span class="font-semibold">Tabel</span> – menyusun data ke dalam baris dan kolom.</li>
+          <li><span class="font-semibold">Grafik/diagram</span> – menyajikan data dalam bentuk visual seperti batang, garis, lingkaran, dan histogram.</li>
+        </ul>
+        <p class="text-gray-700 mt-3">
+          Tujuan utama mempelajari materi ini adalah agar siswa mampu 
+          <span class="font-semibold">membaca, menafsirkan, dan membandingkan</span> informasi yang 
+          disajikan dalam berbagai bentuk grafik.
+        </p>
+      </section>
+
+      <!-- SLIDE 2: Data dan Tabel -->
+      <section class="slide" data-slide="2">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          2. Data dan Penyajian dalam Tabel
+        </h2>
+        <p class="text-gray-700 mb-2">
+          <span class="font-semibold">Data</span> adalah sekumpulan informasi yang diperoleh dari 
+          pengamatan, survei, atau pencatatan. Data dapat dikelompokkan menjadi:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 mb-3 space-y-1">
+          <li><span class="font-semibold">Data kualitatif</span> (categorical / qualitative): berupa kategori atau label, misalnya jenis hobi, warna favorit.</li>
+          <li><span class="font-semibold">Data kuantitatif</span> (numerical / quantitative): berupa angka, misalnya tinggi badan, nilai ulangan.</li>
+        </ul>
+        <p class="text-gray-700 mb-2">
+          Data biasanya disusun terlebih dahulu ke dalam <span class="font-semibold">tabel</span>. 
+          Tabel membantu mengorganisasi data sebelum dibuat grafik.
+        </p>
+        <p class="text-gray-700 mb-2">
+          Unsur penting sebuah tabel:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1">
+          <li><span class="font-semibold">Judul tabel</span> – menjelaskan konteks data.</li>
+          <li><span class="font-semibold">Kolom kategori</span> – hal yang diamati (misalnya jenis minuman).</li>
+          <li><span class="font-semibold">Kolom frekuensi</span> – berisi jumlah setiap kategori.</li>
+          <li><span class="font-semibold">Total frekuensi</span> – jumlah semua data.</li>
+        </ul>
+        <p class="text-gray-700 mt-3">
+          Tabel menjadi dasar untuk menyusun berbagai bentuk grafik seperti diagram batang, lingkaran, garis, dan histogram.
+        </p>
+      </section>
+
+      <!-- SLIDE 3: Peta Jenis Grafik -->
+      <section class="slide" data-slide="3">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          3. Peta Jenis Grafik yang Dipelajari di SMP
+        </h2>
+        <p class="text-gray-700 mb-2">
+          Di SMP, siswa umumnya mempelajari empat jenis grafik utama. 
+          Setiap grafik memiliki fungsi dan kegunaan yang berbeda.
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-2 mt-2">
+          <li>
+            <span class="font-semibold">Bar Chart (Diagram Batang)</span>  
+            – untuk membandingkan jumlah antar kategori.
+          </li>
+          <li>
+            <span class="font-semibold">Pie Chart (Diagram Lingkaran)</span>  
+            – untuk menunjukkan persentase bagian-bagian dari suatu keseluruhan.
+          </li>
+          <li>
+            <span class="font-semibold">Line Chart (Diagram Garis)</span>  
+            – untuk menggambarkan perubahan nilai terhadap waktu (trend).
+          </li>
+          <li>
+            <span class="font-semibold">Histogram</span>  
+            – untuk menunjukkan sebaran data numerik yang dikelompokkan ke dalam interval.
+          </li>
+        </ul>
+        <p class="text-gray-700 mt-3">
+          Memahami perbedaan fungsi tiap grafik penting agar kita dapat memilih jenis grafik yang tepat 
+          untuk menyajikan suatu data.
+        </p>
+      </section>
+
+      <!-- SLIDE 4: Diagram Batang -->
+      <section class="slide" data-slide="4">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          4. Diagram Batang (Bar Chart)
+        </h2>
+        <p class="text-gray-700 mb-2">
+          <span class="font-semibold">Diagram batang</span> menyajikan data dalam bentuk batang 
+          vertikal atau horizontal. Tinggi atau panjang batang menunjukkan 
+          <span class="font-semibold">jumlah (frekuensi)</span> tiap kategori.
+        </p>
+        <p class="text-gray-700 mb-2">
+          Unsur utama diagram batang:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1 mb-4">
+          <li><span class="font-semibold">Sumbu-X</span>: berisi kategori, misalnya jenis buah, nama kelas, atau hari.</li>
+          <li><span class="font-semibold">Sumbu-Y</span>: berisi angka yang menunjukkan jumlah atau frekuensi.</li>
+          <li><span class="font-semibold">Batang</span>: tinggi batang menunjukkan seberapa besar frekuensinya.</li>
+        </ul>
+
+        <!-- Visual: Diagram Batang -->
+        <div class="flex justify-center">
+          <svg class="chart-box" viewBox="0 0 260 180">
+            <!-- Axis -->
+            <line x1="30" y1="20" x2="30" y2="150" stroke="#64748b" stroke-width="2"/>
+            <line x1="30" y1="150" x2="230" y2="150" stroke="#64748b" stroke-width="2"/>
+
+            <!-- Bars -->
+            <rect x="55" y="90" width="30" height="60" rx="4" fill="#38bdf8"/>
+            <rect x="115" y="60" width="30" height="90" rx="4" fill="#0ea5e9"/>
+            <rect x="175" y="40" width="30" height="110" rx="4" fill="#0369a1"/>
+
+            <!-- Labels X -->
+            <text x="70" y="168" font-size="10" text-anchor="middle" fill="#475569">A</text>
+            <text x="130" y="168" font-size="10" text-anchor="middle" fill="#475569">B</text>
+            <text x="190" y="168" font-size="10" text-anchor="middle" fill="#475569">C</text>
+
+            <!-- Labels Y -->
+            <text x="18" y="152" font-size="9" fill="#64748b">0</text>
+            <text x="18" y="122" font-size="9" fill="#64748b">5</text>
+            <text x="18" y="92" font-size="9" fill="#64748b">10</text>
+            <text x="18" y="62" font-size="9" fill="#64748b">15</text>
+            <text x="18" y="32" font-size="9" fill="#64748b">20</text>
+          </svg>
+        </div>
+
+        <p class="text-gray-700 mt-3">
+          Diagram batang cocok digunakan ketika kita ingin 
+          <span class="font-semibold">membandingkan</span> beberapa kategori, 
+          misalnya kategori mana yang paling banyak atau paling sedikit.
+        </p>
+      </section>
+
+      <!-- SLIDE 5: Diagram Lingkaran -->
+      <section class="slide" data-slide="5">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          5. Diagram Lingkaran (Pie Chart)
+        </h2>
+        <p class="text-gray-700 mb-2">
+          <span class="font-semibold">Diagram lingkaran</span> digunakan untuk menunjukkan 
+          <span class="font-semibold">bagian-bagian dari suatu keseluruhan</span> dalam bentuk persentase.
+        </p>
+        <p class="text-gray-700 mb-2">
+          Ciri penting diagram lingkaran:
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1 mb-4">
+          <li>Seluruh lingkaran mewakili <span class="font-semibold">100%</span> dari data.</li>
+          <li>Setiap sektor menunjukkan persentase atau bagian tertentu.</li>
+          <li>Total sudut seluruh sektor adalah <span class="font-semibold">360°</span>.</li>
+        </ul>
+
+        <!-- Visual: Pie Chart -->
+        <div class="flex justify-center">
+          <svg class="chart-box" viewBox="0 0 260 180">
+            <!-- Circle sectors (approximate) -->
+            <circle cx="130" cy="90" r="60" fill="#e0f2fe"/>
+            <!-- Sector 1 (40%) -->
+            <path d="M130,90 L130,30 A60,60 0 0,1 186,116 Z" fill="#0ea5e9"/>
+            <!-- Sector 2 (35%) -->
+            <path d="M130,90 L186,116 A60,60 0 0,1 84,134 Z" fill="#38bdf8"/>
+            <!-- Sector 3 (25%) -->
+            <path d="M130,90 L84,134 A60,60 0 0,1 130,30 Z" fill="#0369a1"/>
+
+            <!-- Labels -->
+            <text x="200" y="80" font-size="10" fill="#0ea5e9">40%</text>
+            <text x="60" y="145" font-size="10" fill="#38bdf8">35%</text>
+            <text x="115" y="30" font-size="10" fill="#0369a1">25%</text>
+          </svg>
+        </div>
+
+        <p class="text-gray-700 mt-3">
+          Diagram lingkaran cocok digunakan bila fokus kita pada 
+          <span class="font-semibold">perbandingan bagian terhadap keseluruhan</span> 
+          (misalnya proporsi minat ekstrakurikuler di suatu kelas).
+        </p>
+      </section>
+
+      <!-- SLIDE 6: Diagram Garis & Histogram -->
+      <section class="slide" data-slide="6">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          6. Diagram Garis dan Histogram
+        </h2>
+
+        <h3 class="text-lg font-semibold text-emerald-600 mb-2">
+          a. Line Chart (Diagram Garis)
+        </h3>
+        <p class="text-gray-700 mb-2">
+          Diagram garis digunakan untuk menunjukkan 
+          <span class="font-semibold">perubahan nilai terhadap waktu</span>. 
+          Titik-titik data dihubungkan dengan garis.
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1 mb-2">
+          <li><span class="font-semibold">Sumbu-X</span>: biasanya waktu (hari, bulan, tahun).</li>
+          <li><span class="font-semibold">Sumbu-Y</span>: nilai yang diamati (misalnya jumlah pengunjung, suhu).</li>
+          <li><span class="font-semibold">Garis</span>: menunjukkan pola perubahan (naik, turun, atau tetap).</li>
+        </ul>
+
+        <!-- Visual: Line Chart -->
+        <div class="flex justify-center my-3">
+          <svg class="chart-box" viewBox="0 0 260 180">
+            <!-- Axis -->
+            <line x1="30" y1="20" x2="30" y2="150" stroke="#64748b" stroke-width="2"/>
+            <line x1="30" y1="150" x2="230" y2="150" stroke="#64748b" stroke-width="2"/>
+
+            <!-- Line with points -->
+            <polyline points="40,130 90,110 140,90 190,100 220,70" fill="none" stroke="#22c55e" stroke-width="2"/>
+            <circle cx="40" cy="130" r="3" fill="#22c55e"/>
+            <circle cx="90" cy="110" r="3" fill="#22c55e"/>
+            <circle cx="140" cy="90" r="3" fill="#22c55e"/>
+            <circle cx="190" cy="100" r="3" fill="#22c55e"/>
+            <circle cx="220" cy="70" r="3" fill="#22c55e"/>
+
+            <!-- X labels -->
+            <text x="40" y="168" font-size="9" text-anchor="middle" fill="#475569">Sen</text>
+            <text x="90" y="168" font-size="9" text-anchor="middle" fill="#475569">Sel</text>
+            <text x="140" y="168" font-size="9" text-anchor="middle" fill="#475569">Rab</text>
+            <text x="190" y="168" font-size="9" text-anchor="middle" fill="#475569">Kam</text>
+            <text x="220" y="168" font-size="9" text-anchor="middle" fill="#475569">Jum</text>
+          </svg>
+        </div>
+
+        <h3 class="text-lg font-semibold text-amber-600 mb-2 mt-2">
+          b. Histogram
+        </h3>
+        <p class="text-gray-700 mb-2">
+          Histogram mirip diagram batang, tetapi batangnya 
+          <span class="font-semibold">saling menempel</span>. 
+          Histogram digunakan untuk data numerik yang telah dikelompokkan ke dalam 
+          <span class="font-semibold">interval (kelas)</span>.
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-1 mb-2">
+          <li><span class="font-semibold">Sumbu-X</span>: interval nilai, misalnya 150–159 cm, 160–169 cm.</li>
+          <li><span class="font-semibold">Sumbu-Y</span>: frekuensi pada setiap interval.</li>
+          <li>Histogram memperlihatkan <span class="font-semibold">pola sebaran</span> data (banyak di tengah, condong ke kiri/kanan, dan sebagainya).</li>
+        </ul>
+
+        <!-- Visual: Histogram -->
+        <div class="flex justify-center mt-3">
+          <svg class="chart-box" viewBox="0 0 260 180">
+            <!-- Axis -->
+            <line x1="30" y1="20" x2="30" y2="150" stroke="#64748b" stroke-width="2"/>
+            <line x1="30" y1="150" x2="230" y2="150" stroke="#64748b" stroke-width="2"/>
+
+            <!-- Histogram bars (touching) -->
+            <rect x="40"  y="110" width="30" height="40" fill="#fed7aa"/>
+            <rect x="70"  y="80"  width="30" height="70" fill="#fdba74"/>
+            <rect x="100" y="60"  width="30" height="90" fill="#fb923c"/>
+            <rect x="130" y="70"  width="30" height="80" fill="#f97316"/>
+            <rect x="160" y="100" width="30" height="50" fill="#ea580c"/>
+
+            <!-- X labels (interval) -->
+            <text x="55"  y="168" font-size="9" text-anchor="middle" fill="#475569">150–159</text>
+            <text x="85"  y="168" font-size="9" text-anchor="middle" fill="#475569">160–169</text>
+            <text x="115" y="168" font-size="9" text-anchor="middle" fill="#475569">170–179</text>
+            <text x="145" y="168" font-size="9" text-anchor="middle" fill="#475569">180–189</text>
+            <text x="175" y="168" font-size="9" text-anchor="middle" fill="#475569">190–199</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: Cara Membaca Grafik -->
+      <section class="slide" data-slide="7">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          7. Langkah Umum Membaca Grafik
+        </h2>
+        <p class="text-gray-700 mb-2">
+          Untuk memahami informasi dari grafik apa pun (batang, lingkaran, garis, maupun histogram), 
+          perhatikan langkah-langkah umum berikut:
+        </p>
+        <ol class="list-decimal list-inside text-gray-700 space-y-1 mb-3">
+          <li><span class="font-semibold">Baca judul grafik</span> untuk mengetahui konteks data.</li>
+          <li><span class="font-semibold">Periksa label sumbu-X dan sumbu-Y</span> (apa yang diwakili masing-masing sumbu).</li>
+          <li><span class="font-semibold">Perhatikan skala</span> pada sumbu-Y (loncatan nilai: 1, 2, 5, 10, dan seterusnya).</li>
+          <li>
+            <span class="font-semibold">Amati bentuk grafik</span>:  
+            batang tertinggi/terendah, sektor terbesar/terkecil, garis naik atau turun, pola sebaran histogram.
+          </li>
+          <li>
+            <span class="font-semibold">Tarik kesimpulan</span>, misalnya:
+            kategori terbanyak, yang paling sedikit, bagaimana perubahan dari waktu ke waktu.
+          </li>
+        </ol>
+        <p class="text-gray-700">
+          Dengan mengikuti langkah ini secara teratur, siswa dapat membaca grafik 
+          dengan lebih teliti dan mengurangi kesalahan penafsiran.
+        </p>
+      </section>
+
+      <!-- SLIDE 8: Miskonsepsi Umum -->
+      <section class="slide" data-slide="8">
+        <h2 class="text-xl md:text-2xl font-bold text-sky-700 mb-3">
+          8. Miskonsepsi Umum dalam Membaca Grafik
+        </h2>
+        <p class="text-gray-700 mb-2">
+          Beberapa kesalahan pemahaman yang sering terjadi saat membaca grafik perlu diwaspadai, 
+          terutama dalam pengembangan Intelligent Tutoring System (ITS).
+        </p>
+        <ul class="list-disc list-inside text-gray-700 space-y-2 mb-3">
+          <li>
+            <span class="font-semibold">Salah membaca sumbu</span>  
+            – mengira angka di sumbu-X adalah frekuensi padahal kategori/waktu, 
+            atau tidak membaca label sumbu dengan benar.
+          </li>
+          <li>
+            <span class="font-semibold">Mengabaikan skala</span>  
+            – tidak menyadari bahwa skala pada sumbu-Y bisa berloncatan (misalnya 0, 5, 10, 15), 
+            sehingga salah memperkirakan jumlah.
+          </li>
+          <li>
+            <span class="font-semibold">Salah menafsirkan diagram lingkaran</span>  
+            – hanya melihat warna atau bentuk tanpa membaca persentase, 
+            atau lupa bahwa total harus 100%.
+          </li>
+          <li>
+            <span class="font-semibold">Salah memahami diagram garis</span>  
+            – menganggap garis sebagai “pergerakan fisik”, bukan perubahan nilai terhadap waktu.
+          </li>
+          <li>
+            <span class="font-semibold">Mencampuradukkan histogram dengan diagram batang</span>  
+            – tidak menyadari bahwa histogram untuk interval nilai (batang menempel), 
+            sedangkan diagram batang untuk kategori (batang terpisah).
+          </li>
+        </ul>
+        <p class="text-gray-700">
+          Menyadari dan memperbaiki miskonsepsi ini akan membantu siswa membaca grafik dengan lebih tepat 
+          dan menjadi dasar yang kuat untuk menyelesaikan soal-soal statistik di jenjang berikutnya.
+        </p>
+      </section>
+
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="mt-6 flex items-center justify-between">
+      <button
+        id="btn-prev"
+        class="px-4 py-2 rounded-xl border border-sky-300 text-sky-700 text-sm md:text-base disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sky-50 hover:-translate-y-0.5 hover:shadow-sm transition-transform transition-colors"
+        disabled
+      >
+        &laquo; Sebelumnya
+      </button>
+      <button
+        id="btn-next"
+        class="px-4 py-2 rounded-xl bg-sky-600 text-white text-sm md:text-base font-semibold hover:bg-sky-700 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition-transform transition-colors"
+      >
+        Berikutnya &raquo;
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const indicator = document.getElementById('slide-indicator');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+
+    let currentIndex = 0;
+
+    function updateSlides() {
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === currentIndex);
+      });
+
+      indicator.textContent = `Slide ${currentIndex + 1} dari ${slides.length}`;
+
+      // tombol prev biasa
+      btnPrev.disabled = currentIndex === 0;
+
+      // tombol next: ubah teks di slide terakhir
+      if (currentIndex === slides.length - 1) {
+        btnNext.textContent = 'Deteksi Miskonsepsi Anda sekarang!';
+      } else {
+        btnNext.textContent = 'Berikutnya »';
+      }
+    }
+
+    btnPrev.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateSlides();
+      }
+    });
+
+    btnNext.addEventListener('click', () => {
+      if (currentIndex < slides.length - 1) {
+        // masih di tengah, pindah slide
+        currentIndex++;
+        updateSlides();
+      } else {
+        // sudah slide terakhir, pindah ke cba3.html
+        window.location.href = 'nama.html';
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateSlides();
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (currentIndex < slides.length - 1) {
+          currentIndex++;
+          updateSlides();
+        } else {
+          // panah kanan di slide terakhir juga ke cba3.html
+          window.location.href = 'cba3.html';
+        }
+      }
+    });
+
+    // panggil sekali di awal supaya indikator & tombol konsisten
+    updateSlides();
+  </script>
+
+</body>
+</html>

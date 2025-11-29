@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Level 3 – Soal 9 | Analisis Diagram Lingkaran</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden transform transition duration-500 hover:shadow-3xl">
+
+    <!-- Header Colorful -->
+    <div class="p-6 md:p-8 bg-gradient-to-br from-indigo-600 to-pink-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Level 3 – Soal 9</h1>
+            <p class="text-lg font-light">Tantangan Analisis Data Siswa</p>
+        </div>
+        <div class="text-5xl">
+            📊
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col  gap-8">
+        
+        <!-- Kolom Grafik -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Persentase Kegiatan Favorit Siswa
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="pieChartActivities"></canvas>
+            </div>
+        </div>
+
+        <!-- Kolom Pertanyaan -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-indigo-700 mb-4">
+                    Nomor 9
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6">
+                    Diagram di samping menunjukkan hasil survei <b>400 siswa</b> mengenai kegiatan ekstrakurikuler favorit mereka. 
+                    Persentase untuk kategori <b>"Bermain Game"</b> tidak tertulis.
+                    <br><br>
+                    Pertanyaan: <b>Berapa total jumlah siswa yang memilih Olahraga dan Bermain Game?</b>
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>A. 180 Siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>B. 220 Siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>C. 260 Siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>D. 300 Siswa</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-indigo-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- TOMBOL LANJUT KE SOAL 10 -->
+                <div id="nextBox" class="hidden mt-6">
+                    <button onclick="kesoal10()" 
+                        class="w-full px-6 py-3 bg-pink-600 text-white font-bold rounded-xl shadow-md hover:bg-pink-700">
+                        Nomor 10 
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ======================= GRAFIK LINGKARAN =======================
+window.onload = function() {
+    const ctx = document.getElementById('pieChartActivities').getContext('2d');
+    
+    // Data Persentase yang diketahui:
+    const dataPersentase = [
+        { label: 'Membaca', percentage: 20 },
+        { label: 'Olahraga', percentage: 35 },
+        { label: 'Seni', percentage: 15 }
+    ];
+
+    // Menghitung persentase yang hilang (Bermain Game)
+    const knownTotal = dataPersentase.reduce((sum, item) => sum + item.percentage, 0);
+    const missingPercentage = 100 - knownTotal; // 100 - (20 + 35 + 15) = 30%
+    
+    // Menambahkan kategori yang hilang
+    dataPersentase.push({ label: 'Bermain Game', percentage: missingPercentage });
+
+    // Data untuk Chart.js
+    const labels = dataPersentase.map(d => `${d.label} (${d.percentage}%)`);
+    const dataPoints = dataPersentase.map(d => d.percentage);
+    
+    // Warna-warna cerah dan berbeda
+    const colors = [
+        '#FF6384', // Membaca
+        '#36A2EB', // Olahraga
+        '#FFCE56', // Seni
+        '#4BC0C0'  // Bermain Game
+    ];
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataPoints,
+                backgroundColor: colors,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) label += ': ';
+                            label += context.raw + '%';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ======================= KONSTAN & KUNCI JAWABAN =======================
+const totalSiswa = 400; 
+// Olahraga = 35% -> 0.35 * 400 = 140
+// Bermain Game = 30% -> 0.30 * 400 = 120
+// Total = 260 siswa
+const kunciJawaban = "C"; 
+
+const miskonsepsiMap = {
+    "A": "Miskonsepsi: Ini mendekati hanya satu kategori (Olahraga) atau penjumlahan yang tidak lengkap.",
+    "B": "Miskonsepsi: Kemungkinan hanya menjumlahkan Olahraga (140) dengan Membaca (80) dan mengabaikan Bermain Game.",
+    "D": "Miskonsepsi: Terjadi kesalahan dalam menjumlahkan persentase atau mengkonversi ke jumlah siswa."
+};
+
+// ======================= REKAP LEVEL 3 (LOCALSTORAGE) =======================
+function simpanLevel3({ soalId, benar, jawaban, kunci }) {
+    let data = JSON.parse( sessionStorage.getItem("rekap_level3") || "null");
+    if (!data) {
+        data = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    data.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    if (benar) data.totalBenar++;
+    else data.totalSalah++;
+
+     sessionStorage.setItem("rekap_level3", JSON.stringify(data));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ======================= CEK JAWABAN =======================
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = (answer === kunciJawaban);
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🌟 Analisis Jenius!<br>" +
+            "1. Persentase Bermain Game: 100% - (20% + 35% + 15%) = 30%.<br>" +
+            "2. Persentase total Olahraga + Bermain Game = 35% + 30% = 65%.<br>" +
+            "3. Jumlah siswa = 65% × 400 = <b>260 siswa</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Coba analisis lagi!<br>" +
+            "1. Hitung dulu persentase 'Bermain Game': 100% - (20% + 35% + 15%) = 30%.<br>" +
+            "2. Jumlahkan dengan persentase Olahraga (35% + 30% = 65%).<br>" +
+            "3. Konversi 65% dari 400 siswa menjadi jumlah siswa.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam langkah persentase atau konversi ke banyak siswa.") +
+            "</i>";
+    }
+
+    // Simpan hasil ke rekap level 3
+    simpanLevel3({
+        soalId: "lv3soal9",
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // Update BN untuk konsep diagram lingkaran & persentase
+    updateBN("M3", benar);
+
+    // Kunci pilihan setelah submit
+    document.querySelectorAll("input[name='jawaban']").forEach(r => r.disabled = true);
+
+    // Tampilkan tombol NEXT ke soal 10
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ======================= NAVIGASI KE SOAL 10 =======================
+function kesoal10() {
+    window.location.href = "lv3soal10.html";
+}
+</script>
+
+</body>
+</html>

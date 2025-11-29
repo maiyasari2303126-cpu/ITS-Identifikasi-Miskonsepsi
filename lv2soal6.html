@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Super HOTS SMP – Grafik Batang Variabel Tersembunyi</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Nilai Tersembunyi -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Misteri Nilai Ujian Siswa</h1>
+            <p class="text-lg font-light">Memecahkan Dua Variabel Frekuensi Tersembunyi (X dan Y)</p>
+        </div>
+        <div class="text-5xl">
+            🕵️📊
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col  gap-8">
+        
+        <!-- Kolom Grafik Batang dengan Data Hilang -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Frekuensi Nilai Ujian Matematika
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="barChartMisteri"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-indigo-600 font-semibold text-center">
+                Catatan: Frekuensi Nilai 7 adalah X, dan Nilai 8 adalah Y.
+            </p>
+        </div>
+
+        <!-- Kolom Pertanyaan SUPER HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-cyan-100 border-2 border-cyan-500 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-blue-800 mb-4">
+                    Nomor 6
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Grafik batang menunjukkan data nilai ujian seluruh siswa. Diketahui:
+                    <ol class="list-decimal list-inside ml-4 space-y-2 mt-4">
+                        <li>Nilai Rata-rata (Mean) keseluruhan siswa adalah 7.8.</li>
+                        <li>Nilai Modus (nilai yang paling sering muncul) adalah 9, dengan frekuensi 12 siswa.</li>
+                    </ol>
+                    <br>
+                    Tugas Anda adalah:
+                    <br>
+                    A. Tentukan nilai X (frekuensi nilai 7) dan Y (frekuensi nilai 8).<br>
+                    B. Setelah X dan Y ditemukan, hitunglah rata-rata baru hanya dari kelompok siswa yang nilainya di bawah 8 (yaitu nilai 5, 6, dan 7).
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>A. 5.8</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>B. 6.0</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>C. 6.2</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-cyan-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>D. 6.5</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-indigo-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- TOMBOL LANJUT KE SOAL 7 -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal7()"
+                            class="w-full px-6 py-3 rounded-xl bg-purple-600 text-white font-bold shadow-md hover:bg-purple-700 transition">
+                        Nomor 7
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK BATANG ======
+window.onload = function() {
+    // F5 = 4, F6 = 8, F7 = X, F8 = Y, F9 = 12, F10 = 6
+    const frekuensiData = [4, 8, 'X', 'Y', 12, 6];
+    const nilaiLabels   = [5, 6, 7, 8, 9, 10];
+    
+    const ctx = document.getElementById('barChartMisteri').getContext('2d');
+    
+    const backgroundColors = [
+        '#FBBF24', // 5
+        '#10B981', // 6
+        '#6366F1', // 7 (X)
+        '#EC4899', // 8 (Y)
+        '#F43F5E', // 9
+        '#3B82F6'  // 10
+    ];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: nilaiLabels.map(n => `Nilai ${n}`),
+            datasets: [{
+                label: 'Jumlah Siswa (Frekuensi)',
+                data: frekuensiData,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors,
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Distribusi Nilai dengan Frekuensi Tersembunyi',
+                    font: { weight: 'bold' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 15,
+                    title: { display: true, text: 'Frekuensi Siswa' }
+                },
+                x: {
+                    title: { display: true, text: 'Nilai Ujian' }
+                }
+            }
+        }
+    });
+}
+
+// ====== LOGIKA SOAL SUPER HOTS ======
+/*
+Diperoleh:
+- X = 4, Y = 6
+- Kelompok nilai < 8: 5 (4 siswa), 6 (8 siswa), 7 (4 siswa)
+- Total nilai baru = 5*4 + 6*8 + 7*4 = 96
+- Total siswa baru = 16
+- Mean baru = 96 / 16 = 6,0
+*/
+const kunciJawaban = "B";
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin salah menghitung rata-rata baru. Cek lagi pembagian total nilai dengan jumlah siswa.",
+    "C": "Kemungkinan nilai X atau Y yang Anda gunakan belum tepat, sehingga rata-ratanya bergeser.",
+    "D": "Nilai 6,5 terlalu tinggi. Pastikan hanya nilai 5, 6, dan 7 yang dipakai untuk rata-rata baru."
+};
+
+// ====== SIMPAN JAWABAN LEVEL 2 ======
+function simpanJawabanLevel2({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level2";
+    let rekap = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!rekap) {
+        rekap = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan    = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar  = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🧠 Kunci jawaban benar!<br>" +
+            "1. Dari rata-rata total 7,8 diperoleh persamaan: <b>Y = 4X − 10</b> dan dengan batasan frekuensi, solusi bilangan bulatnya adalah <b>X = 4</b>, <b>Y = 6</b>.<br>" +
+            "2. Kelompok nilai &lt; 8 adalah 5, 6, dan 7 dengan frekuensi: 4, 8, dan 4 siswa.<br>" +
+            "3. Total nilai = 5·4 + 6·8 + 7·4 = 20 + 48 + 28 = <b>96</b>.<br>" +
+            "4. Total siswa = 4 + 8 + 4 = <b>16</b>.<br>" +
+            "5. Rata-rata baru = 96 / 16 = <b>6,0</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Perhitungan Multi-Variabel Kurang Tepat!<br>" +
+            "Ingat bahwa langkah pentingnya adalah menyelesaikan sistem persamaan untuk mendapatkan X dan Y yang konsisten dengan rata-rata 7,8, lalu menghitung rata-rata baru hanya dari nilai 5, 6, dan 7.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menentukan X dan Y atau dalam menghitung rata-rata bersyarat.") +
+            "</i>";
+    }
+
+    // simpan hasil
+    simpanJawabanLevel2({
+        soalId: "Nomor6",
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // update BN
+    updateBN("M5", benar);
+
+    // disable pilihan
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // tampilkan tombol lanjut
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====== PINDAH KE SOAL 7 ======
+function kesoal7() {
+    // pastikan nama file soal 7 sesuai
+    window.location.href = "lv2soal7.html";
+}
+</script>
+
+</body>
+</html>

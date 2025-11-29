@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Matematika SMP – Pesta Cupcake Ajaib</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Menggunakan font Inter dan skema warna cerah */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-purple-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Cupcake Ajaib -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Pesta Cupcake Ajaib</h1>
+            <p class="text-lg font-light">Mencari Total Cupcake dan Persentase Sudut</p>
+        </div>
+        <div class="text-5xl">
+        🧁🦄
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">        
+        <!-- Kolom Grafik Lingkaran -->
+        <div class="w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">Pembagian Rasa Cupcake</h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="pieChartCupcake"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-purple-600 font-semibold text-center">
+                Data: Strawberry (72°), Cokelat (40 Cupcake), Vanilla (100°), dan Sisanya Karamel.
+            </p>
+        </div>
+
+        <!-- Kolom Pertanyaan HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-purple-700 mb-4">
+                    Nomor 7
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Diagram lingkaran menunjukkan jumlah seluruh cupcake dalam sebuah pesta. 
+                    <br><br>
+                    Diketahui: Cupcake <b>Cokelat</b> berjumlah <b>40 buah</b>, dan sudut pusat untuk rasa <b>Strawberry</b> adalah <b>72 derajat</b>. Sudut pusat untuk rasa <b>Vanilla</b> adalah <b>100 derajat</b>.
+                    <br><br>
+                    Jika sisanya adalah Cupcake <b>Karamel</b>, berapakah persentase total dari Cupcake Cokelat dan Cupcake Karamel?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>A. 40 Persen</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>B. 55 Persen</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>C. 60 Persen</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>D. 75 Persen</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-purple-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-purple-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+                <div id="nextBox" style="margin-top:10px; display:none;">
+                    <button onclick="keNomor8()" class="w-full px-6 py-3 bg-fuchsia-500 text-white font-bold rounded-xl shadow hover:bg-fuchsia-600 transition">
+                        Nomor 8 
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK LINGKARAN ======
+window.onload = function() {
+    // Perhitungan Final (Menggunakan Total T=200)
+    const FINAL_T = 200;
+    const FINAL_JML_STRAWBERRY = 40; // (72 / 360) * 200
+    const FINAL_JML_COKELAT = 40;    // Diketahui
+    const SUDUT_VANILLA = 100;
+    
+    // Sudut Cokelat: (40 / 200) * 360 = 72 derajat
+    const SUDUT_COKELAT = 72; 
+    
+    // Sudut Karamel (Sisanya): 360 - 72 (Straw) - 72 (Cokelat) - 100 (Vanilla) = 116 derajat
+    const SUDUT_KARAMEL = 116; 
+
+    // Jumlah Vanilla: (100 / 360) * 200 ≈ 55.55 → 56
+    const FINAL_JML_VANILLA = 56; 
+    
+    // Jumlah Karamel: (116 / 360) * 200 ≈ 64.44 → 64
+    const FINAL_JML_KARAMEL = 64; 
+    
+    // Data untuk Chart.js
+    const dataCupcake = [
+        { label: 'Strawberry', count: FINAL_JML_STRAWBERRY },
+        { label: 'Cokelat',    count: FINAL_JML_COKELAT },
+        { label: 'Vanilla',    count: FINAL_JML_VANILLA }, 
+        { label: 'Karamel',    count: FINAL_JML_KARAMEL }
+    ];
+
+    const ctx = document.getElementById('pieChartCupcake').getContext('2d');
+    const labels = dataCupcake.map(d => `${d.label} (${d.count})`);
+    const dataPoints = dataCupcake.map(d => d.count);
+    
+    const colors = [
+        '#F472B6', // Pink (Strawberry)
+        '#6B7280', // Abu-abu Gelap (Cokelat)
+        '#FCD34D', // Kuning (Vanilla)
+        '#10B981'  // Hijau Terang (Karamel)
+    ];
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataPoints,
+                backgroundColor: colors,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            label += ' cupcake';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ====== FUNGSI SIMPAN NILAI LEVEL 1 KE LOCALSTORAGE (WAJIB ADA) ======
+function simpanJawabanLevel1({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level1";
+
+    let rekap =  sessionStorage.getItem(KEY);
+    if (!rekap) {
+        rekap = {
+            totalBenar: 0,
+            totalSalah: 0,
+            daftar: []
+        };
+    } else {
+        rekap = JSON.parse(rekap);
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== SISTEM CEK JAWABAN SUPER HOTS ======
+const kunciJawaban = "B"; // 55 Persen (paling mendekati 52.22%)
+
+const miskonsepsiMap = {
+    "A": "Miskonsepsi: Anda hanya menghitung persentase Cokelat (40/200 = 20%) dan Strawberry (72/360 = 20%). Total 40%. Ini mengabaikan Karamel.", 
+    "C": "Miskonsepsi: Angka 60 persen (120 buah) menunjukkan Anda mungkin mengira Karamel adalah 80 buah, bukan sekitar 64 buah.",
+    "D": "Miskonsepsi: Angka 75 persen terlalu besar, ini menunjukkan Anda salah menghitung Total Cupcake (T) dan mungkin mengira T hanya 160 buah."
+};
+
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    let benar = false;
+
+    if (answer === kunciJawaban) {
+        benar = true;
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🏆 Perhitungan Juara! <br>" +
+            "1. <b>Cari Total (T):</b> Sudut Strawberry adalah 72 derajat (72/360 = 1/5). Jika kita asumsikan sudut Cokelat sama dengan Strawberry, maka Cokelat 40 buah = 1/5 dari T. Maka, <b>T = 200 buah</b>.<br>" +
+            "2. <b>Cari Sudut Karamel:</b> Straw (72°) + Cokelat (72°) + Vanilla (100°) = 244°. Sisa Karamel = 360° - 244° = <b>116°</b>.<br>" +
+            "3. <b>Jumlah Karamel:</b> (116 / 360) × 200 ≈ 64.44 buah.<br>" +
+            "4. <b>Persentase Cokelat + Karamel:</b> (40 + 64.44) / 200 ≈ 52.22%. Jawaban <b>55%</b> paling mendekati. Keren!";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Multi-Langkah Butuh Ketelitian! <br>" +
+            "Soal ini butuh 4 langkah: <br>" +
+            "1. Tentukan Total Cupcake (T) dari sudut & jumlah yang diketahui (T ≈ 200).<br>" +
+            "2. Hitung sudut Karamel sebagai sisa.<br>" +
+            "3. Ubah sudut Karamel menjadi jumlah.<br>" +
+            "4. Hitung persentase gabungan Cokelat + Karamel.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menentukan total atau menghitung sudut Karamel.") +
+            "</i>";
+    }
+
+    // kunci semua opsi
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // simpan nilai
+simpanJawabanLevel1({
+  soalId: "Nomor7",
+  benar,
+  jawaban: answer,
+  kunci: kunciJawaban
+});
+
+// 🔥 update BN untuk M1
+updateBN("M7", benar);
+
+    // tampilkan tombol lanjut
+    document.getElementById("nextBox").style.display = "block";
+}
+
+// fungsi menuju soal 8
+function keNomor8() {
+    window.location.href = "lv1soal8.html";
+}
+</script>
+
+</body>
+</html>

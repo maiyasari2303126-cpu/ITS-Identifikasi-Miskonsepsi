@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Statistika SMP – Perbandingan 2 Grafik</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.4.2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-yellow-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <div class="p-6 md:p-8 bg-gradient-to-r from-orange-500 to-amber-400 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Perbandingan Nilai Ujian Bulanan</h1>
+            <p class="text-lg font-light">Menganalisis Kinerja Aurel dan Bima Selama 6 Bulan</p>
+        </div>
+        <div class="text-5xl">
+        ⭐🆚
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">Tren Nilai Ujian (Skor 0-100)</h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="lineChartPerbandingan"></canvas> 
+            </div>
+            <p class="mt-2 text-sm text-orange-600 font-semibold text-center">
+                Sumbu Y: Nilai Ujian | Sumbu X: Bulan ke-
+            </p>
+        </div>
+
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-amber-100 border-2 border-amber-500 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-red-700 mb-4">
+                    Nomor 4
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Hitunglah rata-rata (Mean) seluruh nilai Aurel (Garis Biru) selama 6 bulan. Misalkan hasil rata-rata ini adalah <b>R</b>.
+                    <br><br>
+                    Tentukan bulan-bulan di mana nilai Bima (Garis Merah) berada <b>di atas</b> nilai R. Setelah bulan-bulan tersebut teridentifikasi, berapakah total selisih nilai antara Bima dan Aurel pada semua bulan yang memenuhi kriteria tersebut?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>A. 15 poin</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>B. 20 poin</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>C. 25 poin</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>D. 30 poin</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-orange-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="keNomor5()" 
+                            class="w-full px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-md hover:bg-indigo-700 transition">
+                         Nomor 5
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK GARIS ======
+window.onload = function() {
+    // DATA NILAI
+    const dataAurel = [80, 75, 90, 85, 70, 90]; // Biru
+    const dataBima  = [70, 85, 75, 95, 80, 90]; // Merah
+    const labelsBulan = [1, 2, 3, 4, 5, 6];
+    
+    // Pastikan element canvas sudah ada sebelum memanggil getContext
+    const ctx = document.getElementById('lineChartPerbandingan');
+    if (!ctx) return; // Jika elemen tidak ditemukan, hentikan skrip
+
+    const chartContext = ctx.getContext('2d');
+    
+    const colorAurel = 'rgb(59, 130, 246)'; 
+    const colorBima  = 'rgb(239, 68, 68)';  
+
+    const chartInstance = new Chart(chartContext, {
+        type: 'line',
+        data: {
+            labels: labelsBulan.map(b => `Bulan ${b}`),
+            datasets: [
+                {
+                    label: 'Aurel (Garis Biru)',
+                    data: dataAurel,
+                    borderColor: colorAurel,
+                    backgroundColor: colorAurel + '1A', 
+                    fill: false,
+                    tension: 0.3, 
+                    borderWidth: 4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                },
+                {
+                    label: 'Bima (Garis Merah)',
+                    data: dataBima,
+                    borderColor: colorBima,
+                    backgroundColor: colorBima + '1A',
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { padding: 15 }
+                },
+                title: {
+                    display: true,
+                    text: 'Tren Nilai Ujian 6 Bulan',
+                    font: { weight: 'bold' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 60,
+                    max: 100,
+                    title: { display: true, text: 'Skor Nilai' }
+                },
+                x: {
+                    title: { display: true, text: 'Bulan ke-' }
+                }
+            }
+        }
+    });
+
+    // Tambahkan konfigurasi ANOTASI (Garis Rata-rata)
+    // Rata-rata Aurel (490/6 ≈ 81.67)
+    chartInstance.options.plugins.annotation = {
+        annotations: {
+            lineRataRata: {
+                type: 'line',
+                yMin: 81.67,
+                yMax: 81.67,
+                borderColor: 'rgba(52, 152, 219, 0.5)',
+                borderWidth: 2,
+                borderDash: [6, 6],
+                label: {
+                    content: 'Rata-rata Aurel (R ≈ 81.67)',
+                    display: true,
+                    position: 'end',
+                    backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                    font: { size: 10 }
+                }
+            }
+        }
+    };
+    // Panggil update agar anotasi diterapkan
+    chartInstance.update();
+}
+
+// ====== LOGIKA SOAL ======
+const kunciJawaban = "B"; // 20 poin
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin hanya mengambil selisih dua bulan atau salah menghitung rata-rata Aurel (R). Pastikan Anda menyertakan Bulan 6 (selisih = 0) jika Bima > R di sana.",
+    "C": "Anda kemungkinan salah menentukan batas Rata-rata Aurel (R ≈ 81.67) atau memasukkan Bulan 5 (nilai Bima 80) yang seharusnya tidak memenuhi syarat.",
+    "D": "Terjadi kesalahan besar pada perhitungan rata-rata (R) atau pemilihan bulan yang memenuhi kriteria Bima > R."
+};
+
+// ====== SIMPAN JAWABAN LEVEL 2 (FUNGSI ITS) ======
+function simpanJawabanLevel2({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level2";
+    let rekap = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!rekap) {
+        rekap = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+
+    feedbackDiv.classList.remove("hidden");
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = answer === kunciJawaban;
+
+    const dataAurel = [80, 75, 90, 85, 70, 90]; 
+    const totalAurel = dataAurel.reduce((a, b) => a + b, 0);
+    const RataRataR = totalAurel / dataAurel.length;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🏆 Perhitungan Juara! <br> Anda berhasil memadukan konsep Rata-rata dan Interpretasi Grafik.<br>" +
+            "1. <b>Rata-rata Aurel (R):</b> " + totalAurel + " / 6 ≈ <b>" + RataRataR.toFixed(2) + "</b>.<br>" +
+            "2. <b>Bima > R (81.67)</b> di **Bulan 2 (85)**, **Bulan 4 (95)**, dan **Bulan 6 (90)**.<br>" +
+            "3. <b>Total Selisih:</b> (85-75) + (95-85) + (90-90) = 10 + 10 + 0 = <b>20 poin</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Perbandingan Kurang Tepat! Fokus pada Tiga Langkah Utama:<br>" +
+            "1. Cek kembali perhitungan Rata-rata Aurel (R ≈ 81.67).<br>" +
+            "2. Identifikasi Bulan yang memenuhi syarat (Nilai Bima harus <b>di atas</b> 81.67).<br>" +
+            "3. Hitung dan jumlahkan **Selisih** nilai (Bima - Aurel) di bulan-bulan tersebut.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menghitung rata-rata atau dalam memilih bulan yang memenuhi syarat.") +
+            "</i>";
+    }
+
+   // simpan rekap level 2
+  simpanJawabanLevel2({
+    soalId: "Nomor4",   // sesuaikan kalau ID-soalmu beda
+    benar,
+    jawaban: answer,
+    kunci: kunciJawaban
+  });
+
+  // update BN → soal ini memetakan miskonsepsi M3
+  updateBN("M3", benar);
+
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+    document.querySelector('button[onclick="cekJawaban()"]').disabled = true;
+
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====== PINDAH KE SOAL 5 ======
+function keNomor5() {
+    window.location.href = "lv2soal5.html";
+}
+</script>
+
+</body>
+</html>

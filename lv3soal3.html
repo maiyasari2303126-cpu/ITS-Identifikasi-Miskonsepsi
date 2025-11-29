@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Kelas 9 – Analisis Diagram Lingkaran Biaya (Level 3 – Soal 3)</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Menggunakan font Inter dan skema warna cerah */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style untuk menampung Chart agar responsif */
+        .chart-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-red-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Produksi Ceria -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Peta Anggaran Produksi Biskuit Ceria</h1>
+            <p class="text-lg font-light">Analisis Total Biaya dan Proporsi Sudut-Persentase (Level 3 – Soal 3)</p>
+        </div>
+        <div class="text-5xl">
+        🍪💰
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col  gap-8">
+        
+        <!-- Kolom Grafik Lingkaran -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Distribusi Biaya Produksi (Persentase dan Sudut)
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner chart-container">
+                <canvas id="pieChartSuperHots"></canvas>
+            </div>
+            <div class="mt-4 p-3 bg-purple-100 rounded-lg text-sm text-purple-700 font-medium w-full">
+                Petunjuk: Sudut Biaya Overhead adalah 72 derajat. Total seluruh Biaya belum diketahui.
+            </div>
+        </div>
+
+        <!-- Kolom Pertanyaan SUPER HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-pink-100 border-2 border-pink-500 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-red-700 mb-4">
+                    Nomor 3
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Diagram lingkaran menunjukkan distribusi Biaya Produksi Biskuit Ceria dengan rincian:
+                    <ul class="list-disc list-inside ml-4 space-y-1 mt-4">
+                        <li>Bahan Baku (BB): 30%</li>
+                        <li>Tenaga Kerja (TK): 25%</li>
+                        <li>Pemasaran (PM): 15%</li>
+                        <li>Overhead (OH): 72 derajat</li>
+                        <li>Inovasi (IN): Sisanya</li>
+                    </ul>
+                    <br>
+                    Clue Emas: <span class="font-bold text-red-600">Selisih Biaya Bahan Baku dan Biaya Inovasi adalah Rp 60.000.000</span>.
+                    <br><br>
+                    Tugas utama Anda:
+                    <br>
+                    Setelah menghitung total biaya produksi, hitunglah nilai dari ekspresi berikut: 
+                    <br>
+                    <b>(Biaya Pemasaran dibagi 15.000.000) ditambah (Biaya Overhead dibagi 30.000.000)</b>
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>A. 3</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>B. 5</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>C. 7</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-red-600 h-5 w-5 mr-4">
+                        <span>D. 10</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-red-700 active:scale-[0.98]">
+                    SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- BOX LANJUT KE SOAL 4 LEVEL 3 -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal4()" 
+                            class="w-full px-6 py-3 rounded-xl bg-purple-600 text-white font-bold shadow-md hover:bg-purple-700 transition">
+                        Nomor 4  
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK LINGKARAN ======
+window.onload = function() {
+    // Overhead: 72° = (72/360)*100% = 20%
+    // Inovasi: 100% - (30 + 25 + 15 + 20) = 10%
+    const persentaseData = [30, 25, 15, 20, 10]; 
+    const kategoriLabels = [
+        'Bahan Baku (30%)',
+        'Tenaga Kerja (25%)',
+        'Pemasaran (15%)',
+        'Overhead (20%)',
+        'Inovasi (10%)'
+    ];
+    
+    const ctx = document.getElementById('pieChartSuperHots').getContext('2d');
+    
+    const backgroundColors = [
+        '#FBBF24', // Kuning (Bahan Baku)
+        '#6366F1', // Ungu (Tenaga Kerja)
+        '#EF4444', // Merah (Pemasaran)
+        '#10B981', // Hijau (Overhead)
+        '#EC4899'  // Pink (Inovasi)
+    ];
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: kategoriLabels,
+            datasets: [
+                {
+                    label: 'Persentase Biaya',
+                    data: persentaseData,
+                    backgroundColor: backgroundColors,
+                    hoverOffset: 12,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 14 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed !== null) label += context.parsed + '%';
+                            return label;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Distribusi Biaya Produksi',
+                    font: { weight: 'bold' }
+                }
+            }
+        }
+    });
+}
+
+// ====== ANALISIS MATEMATIS (RINGKAS) ======
+/*
+1. Overhead: 72° → 20%.
+2. Inovasi: 100% − (30 + 25 + 15 + 20) = 10%.
+3. Selisih BB dan IN = (30 − 10)% = 20% dari T = Rp 60.000.000
+   → T = 60.000.000 / 0,20 = Rp 300.000.000
+4. PM = 15% × 300.000.000 = 45.000.000
+   OH = 20% × 300.000.000 = 60.000.000
+5. Ekspresi:
+   (PM / 15.000.000) + (OH / 30.000.000)
+   = (45 jt / 15 jt) + (60 jt / 30 jt)
+   = 3 + 2 = 5
+*/
+const kunciJawaban = "B"; // 5
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin salah dalam menghitung persentase atau biaya Overhead sehingga rasio akhirnya terlalu kecil.",
+    "C": "Angka 7 terlalu besar; cek lagi total biaya produksi (seharusnya Rp 300.000.000) dan pembagian di langkah akhir.",
+    "D": "Angka 10 jauh terlalu besar; kemungkinan ada kesalahan konversi sudut 72° ke persentase (harusnya 20%) atau salah hitung Inovasi."
+};
+
+// ====== SIMPAN JAWABAN LEVEL 3 DI localStorage ======
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level3";
+    let rekap = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!rekap) {
+        rekap = {
+            totalBenar: 0,
+            totalSalah: 0,
+            daftar: []
+        };
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🧠 Kunci Jawaban Benar!<br>" +
+            "1. Overhead 72° dikonversi menjadi 20% dari total biaya.<br>" +
+            "2. Inovasi menjadi 10% sehingga selisih BB dan IN adalah 20% = Rp 60.000.000 → Total biaya Rp 300.000.000.<br>" +
+            "3. Biaya PM = 45 Juta dan OH = 60 Juta.<br>" +
+            "4. Ekspresi: (45 jt / 15 jt) + (60 jt / 30 jt) = 3 + 2 = <b>5</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Biaya Produksi Kurang Tepat!<br>" +
+            "Kunci langkahnya: konversi 72° → 20%, temukan Inovasi 10%, gunakan selisih 20% = Rp 60 Juta untuk mencari total biaya Rp 300 Juta, lalu hitung rasio akhir.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kemungkinan salah pada konversi sudut ke persentase, penentuan total biaya, atau operasi pembagian di langkah terakhir.") +
+            "</i>";
+    }
+
+    // Simpan ke rekap LEVEL 3
+    simpanJawabanLevel3({
+        soalId: "lv3soal3",   // ⬅️ Soal 3 Level 3
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // Update BN node M9
+    updateBN("M9", benar);
+
+    // Disable opsi setelah menjawab
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // Tampilkan tombol lanjut ke soal 4
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====== PINDAH KE SOAL 4 LEVEL 3 ======
+function kesoal4() {
+    window.location.href = "lv3soal4.html";
+}
+</script>
+
+</body>
+</html>

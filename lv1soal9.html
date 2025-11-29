@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Matematika SMP – Grafik Garis Perbandingan Startup</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-violet-500 to-pink-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Dua Kurva Pertumbuhan Pendapatan</h1>
+            <p class="text-lg font-light">Analisis Laju Perubahan Startup Alpha dan Beta</p>
+        </div>
+        <div class="text-5xl">📈🚀</div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+
+        <!-- Grafik -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Grafik Pendapatan (dalam Juta Rupiah)
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="lineChartKlub"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-violet-600 font-semibold text-center">
+                Sumbu Y: Pendapatan (Juta IDR) | Sumbu X: Bulan
+            </p>
+        </div>
+
+        <!-- Pertanyaan -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-pink-50 border-2 border-pink-400 rounded-xl shadow-lg">
+
+                <p class="text-2xl font-extrabold text-violet-700 mb-4">Nomor 9</p>
+
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Grafik garis menunjukkan perbandingan pendapatan bulanan (Juta Rupiah)
+                    antara Startup Alpha (Ungu) dan Beta (Biru). <br><br>
+                    Pendapatan Alpha pada Bulan ke-1 adalah <b>20 Juta</b>. <br><br>
+                    Pada bulan ke berapakah selisih pendapatan (Alpha − Beta)
+                    sama dengan setengah pendapatan Alpha Bulan ke-1?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-100">
+                        <input type="radio" name="jawaban" value="A" class="h-5 w-5 mr-4"> A. Bulan 2
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-100">
+                        <input type="radio" name="jawaban" value="B" class="h-5 w-5 mr-4"> B. Bulan 3
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-100">
+                        <input type="radio" name="jawaban" value="C" class="h-5 w-5 mr-4"> C. Bulan 4
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-pink-100">
+                        <input type="radio" name="jawaban" value="D" class="h-5 w-5 mr-4"> D. Bulan 5
+                    </label>
+                </div>
+
+                <!-- TOMBOL SUBMIT -->
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-violet-600 text-white font-bold rounded-xl shadow-md hover:bg-violet-700">
+                     SUBMIT
+                </button>
+
+                <div id="feedback"
+                     class="mt-6 p-4 rounded-xl text-md font-semibold border hidden duration-300"></div>
+
+                <!-- TOMBOL SOAL 10 (SUDAH DISESUAIKAN) -->
+                <div id="nextBox" class="mt-4 hidden">
+                    <button onclick="keNomor10()"
+                            class="w-full px-8 py-3 bg-violet-600 text-white font-bold rounded-xl shadow-md hover:bg-violet-700">
+                        Nomor 10 
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===========================
+//   GRAFIK
+// ===========================
+window.onload = function() {
+    const dataAlpha = [20, 30, 40, 50, 60];
+    const dataBeta = [5, 15, 30, 50, 75];
+    const labelsBulan = [1, 2, 3, 4, 5];
+
+    const ctx = document.getElementById('lineChartKlub').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labelsBulan.map(b => `Bulan ${b}`),
+            datasets: [
+                {
+                    label: 'Alpha (IDR Juta)',
+                    data: dataAlpha,
+                    borderColor: 'rgb(139, 92, 246)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 4,
+                    pointRadius: 6
+                },
+                {
+                    label: 'Beta (IDR Juta)',
+                    data: dataBeta,
+                    borderColor: 'rgb(14, 165, 233)',
+                    backgroundColor: 'rgba(14,165,233,0.1)',
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 4,
+                    pointRadius: 6
+                }
+            ]
+        }
+    });
+};
+
+// ===========================
+//   CEK JAWABAN
+// ===========================
+const kunciJawaban = "B";
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin menghitung selisih kumulatif, bukan selisih per bulan.",
+    "C": "Anda mungkin mencari titik potong (selisih 0), bukan target selisih 10.",
+    "D": "Beta sudah melampaui Alpha, selisih negatif."
+};
+
+// rekap jawaban
+function simpanJawabanLevel1({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level1";
+    let rekap = JSON.parse(sessionStorage.getItem(KEY) || "{}");
+
+    if (!rekap.daftar) {
+        rekap = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    rekap.daftar.push({
+        soalId,
+        benar,
+        jawaban,
+        kunci,
+        waktu: new Date().toLocaleString()
+    });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+    sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+function initBN() {
+  let BN = JSON.parse(sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4,
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawaban terlebih dahulu.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "<b>🏆 Tepat!</b><br>Selisih pendapatan di Bulan 3 adalah 10 Juta — sama dengan setengah pendapatan Alpha Bulan 1.";
+    } else {
+        feedbackDiv.className =
+            "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Jawaban kurang tepat.<br>Miskonsepsi: <i>" + miskonsepsiMap[answer] + "</i>";
+    }
+
+    document.querySelectorAll('input[name=\"jawaban\"]').forEach(r => r.disabled = true);
+
+    // simpan nilai
+    simpanJawabanLevel1({
+      soalId: "Nomor9",
+      benar,
+      jawaban: answer,
+      kunci: kunciJawaban
+    });
+
+    // update BN untuk M9
+    updateBN("M9", benar);
+
+    // munculkan tombol Soal 10
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+function keNomor10() {
+    window.location.href = "lv1soal10.html";
+}
+</script>
+
+</body>
+</html>

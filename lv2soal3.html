@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Statistika SMP – Sudut Sektor & Frekuensi</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Menggunakan font Inter dan skema warna cerah */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="bg-pink-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Minat Siswa -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-violet-500 to-pink-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Survei Minat Ekstrakurikuler</h1>
+            <p class="text-lg font-light">Mencari Selisih Frekuensi dari Sudut Terbesar dan Persentase Terkecil</p>
+        </div>
+        <div class="text-5xl">
+        🎨🏀🧪
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <!-- Kolom Grafik Lingkaran -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">Pembagian Minat Siswa</h2>
+            <div class="chart-container h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="pieChartMinat"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-violet-700 font-semibold text-center">
+                Data: Olahraga (45%), Sains (30%), Seni (20%), Sisanya adalah Ekskul Lain (10 Siswa)
+            </p>
+        </div>
+
+        <!-- Kolom Pertanyaan HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-purple-50 border-2 border-purple-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-pink-700 mb-4">
+                    Nomor 3
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Diagram lingkaran menunjukkan minat ekstrakurikuler <b>seluruh</b> siswa kelas 8. 
+                    <br><br>
+                    Diketahui: Olahraga (45%), Sains (30%), Seni (20%), dan sisanya yang memilih Ekskul Lain sebanyak <b>10 siswa</b>.
+                    <br><br>
+                    Berapakah selisih jumlah siswa (frekuensi) antara sektor dengan <b>sudut pusat terbesar</b> dan sektor dengan <b>persentase terkecil</b>?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>A. 50 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>B. 60 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>C. 80 siswa</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-purple-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-pink-600 h-5 w-5 mr-4">
+                        <span>D. 90 siswa</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-violet-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-violet-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <div id="nextBox" class="mt-6 hidden">
+    <button onclick="keNomor4()" 
+            class="w-full px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold shadow-md hover:bg-indigo-700 transition">
+        Nomor 4
+    </button>
+</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK LINGKARAN ======
+window.onload = function() {
+    // --- Langkah 1: Mencari Persentase dan Total Siswa (N) ---
+    const persenOlahraga = 45; 
+    const persenSains = 30;
+    const persenSeni = 20;
+    const jmlEkskulLain = 10; // Diketahui
+    
+    // Persentase Ekskul Lain (Terkecil)
+    const persenEkskulLain = 100 - (persenOlahraga + persenSains + persenSeni); // 5%
+
+    // Hitung Total Siswa (N) → 5% = 10 siswa → N = 10 / 0.05 = 200
+    const totalSiswa = 200; 
+
+    // --- Langkah 2: Menghitung Frekuensi dan Sudut per Sektor ---
+    const jmlOlahraga = (persenOlahraga / 100) * totalSiswa; // 90
+    const jmlSains    = (persenSains    / 100) * totalSiswa; // 60
+    const jmlSeni     = (persenSeni     / 100) * totalSiswa; // 40
+    const jmlEkskulLainFinal = jmlEkskulLain;                // 10
+
+    const dataMinat = [
+        { label: `Olahraga (${jmlOlahraga} Siswa)`,     count: jmlOlahraga },
+        { label: `Sains (${jmlSains} Siswa)`,           count: jmlSains },
+        { label: `Seni (${jmlSeni} Siswa)`,             count: jmlSeni },
+        { label: `Ekskul Lain (${jmlEkskulLainFinal} Siswa)`, count: jmlEkskulLainFinal }
+    ];
+
+    const ctx = document.getElementById('pieChartMinat').getContext('2d');
+    const labels = dataMinat.map(d => d.label);
+    const dataPoints = dataMinat.map(d => d.count);
+    
+    const colors = [
+        '#6D28D9', // Olahraga
+        '#06B6D4', // Sains
+        '#FBBF24', // Seni
+        '#F472B6'  // Ekskul Lain
+    ];
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataPoints,
+                backgroundColor: colors,
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            return label + ' siswa';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ====== SISTEM CEK JAWABAN SUPER HOTS ======
+/*
+Langkah 1: Tentukan N (Total Siswa)
+   Ekskul Lain = 5%.
+   5% = 10 siswa -> N = 200 siswa.
+
+Langkah 2: Sektor sudut terbesar → Olahraga (45%) → 90 siswa.
+Langkah 3: Persentase terkecil → Ekskul Lain (5%) → 10 siswa.
+Langkah 4: Selisih = 90 - 10 = 80 siswa.
+*/
+const kunciJawaban = "C"; // 80 siswa
+
+// Mapping miskonsepsi
+const miskonsepsiMap = {
+    "A": "Miskonsepsi: Anda mungkin menghitung selisih antara Olahraga (90) dan Seni (40), atau salah menentukan Total Siswa (N).", 
+    "B": "Miskonsepsi: Anda mungkin hanya mengambil frekuensi Sains (60 siswa) tanpa menghitung selisih.",
+    "D": "Miskonsepsi: Angka 90 adalah frekuensi Olahraga (sektor dengan sudut terbesar). Anda lupa mengurangkan dengan frekuensi terkecil."
+};
+
+// ====== FUNGSI SIMPAN NILAI LEVEL 1 ======
+function simpanJawabanLevel2({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level2";
+    let rekap =  sessionStorage.getItem(KEY);
+
+    rekap = rekap ? JSON.parse(rekap) : {
+        totalBenar: 0,
+        totalSalah: 0,
+        daftar: []
+    };
+
+    const waktu = new Date().toLocaleString();
+
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse(localStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🏆 Perhitungan Juara! <br>" +
+            "1. <b>Cari Total Siswa (N):</b> Ekskul Lain = 100% - (45% + 30% + 20%) = 5%. Karena 5% = 10 siswa, maka N = 10 / 0.05 = <b>200 siswa</b>.<br>" +
+            "2. <b>Sektor Sudut Terbesar:</b> Olahraga (45%). Frekuensi: 45% × 200 = <b>90 siswa</b>.<br>" +
+            "3. <b>Sektor Persentase Terkecil:</b> Ekskul Lain (5%). Frekuensi: <b>10 siswa</b>.<br>" +
+            "4. <b>Hitung Selisih Frekuensi:</b> 90 − 10 = <b>80 siswa</b>. Analisis multi-langkah yang sangat rapi!";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Multi-Langkah Kurang Tepat! <br>" +
+            "Soal ini menguji 4 langkah: 1) Menghitung Total Siswa (N=200). 2) Menentukan sektor dengan sudut terbesar (Olahraga). 3) Menentukan sektor dengan persentase terkecil (Ekskul Lain). 4) Menghitung selisih frekuensi (90 − 10 = 80). <br>" +
+            "Coba periksa kembali terutama pada penentuan total siswa dan selisih frekuensinya. Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menentukan total siswa atau salah menghitung selisih frekuensi.") +
+            "</i>";
+    }
+
+
+
+    // simpan rekap level 2
+  simpanJawabanLevel2({
+    soalId: "Nomor3",   // sesuaikan kalau ID-soalmu beda
+    benar,
+    jawaban: answer,
+    kunci: kunciJawaban
+  });
+
+  // update BN → soal ini memetakan miskonsepsi M9
+  updateBN("M2", benar);
+
+// 🔹 Disable opsi setelah kirim
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // tampilkan tombol next (hapus class hidden)
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+    
+
+
+// Pindah ke halaman hasil level 1 (atau soal berikutnya kalau mau)
+function keNomor4() {
+    // kalau ini bukan soal terakhir, bisa diganti ke "lv1_soal10.html" dll.
+    window.location.href = "lv2soal4.html";
+}
+</script>
+
+</body>
+</html>

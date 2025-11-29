@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hasil Level 3</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8">
+  
+  <h1 class="text-3xl font-extrabold text-sky-700 mb-2 text-center">
+    Rekap Hasil Level 3
+  </h1>
+
+  <!-- ⭐ Nama siswa -->
+  <p class="text-center text-gray-700 mb-1 text-lg">
+    Nama Siswa: <span id="namaSiswaDisplay" class="font-semibold text-sky-700">-</span>
+  </p>
+
+  <p class="text-center text-gray-600 mb-6">
+    Ringkasan nilai dan riwayat pengerjaan siswa.
+  </p>
+
+  <!-- Ringkasan nilai -->
+  <div id="ringkasan" class="mb-6 p-4 rounded-2xl bg-sky-50 border border-sky-300 text-center"></div>
+
+  <!-- Tabel riwayat -->
+  <h2 class="text-xl font-bold text-gray-700 mb-2">Riwayat Pengerjaan</h2>
+  <div class="overflow-x-auto mb-6">
+    <table class="w-full text-sm border border-slate-300">
+      <thead class="bg-slate-100">
+        <tr>
+          <th class="p-2 border border-slate-300">No</th>
+          <th class="p-2 border border-slate-300">ID Soal</th>
+          <th class="p-2 border border-slate-300">Jawaban</th>
+          <th class="p-2 border border-slate-300">Kunci</th>
+          <th class="p-2 border border-slate-300">Status</th>
+          <th class="p-2 border border-slate-300">Waktu</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyRiwayat"></tbody>
+    </table>
+  </div>
+
+  <!-- Daftar remidi -->
+  <h2 class="text-xl font-bold text-gray-700 mb-2">Soal yang Perlu Remidi</h2>
+  <div id="remidiList" class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-300 text-sm"></div>
+
+  <!-- Tombol aksi -->
+  <div class="mt-4 flex flex-col md:flex-row gap-3 md:justify-between">
+
+    <button id="btnRemidi"
+      onclick="remidiLevel3()"
+      class="w-full md:w-auto px-4 py-2 rounded-xl bg-orange-500 text-white font-semibold hover:bg-orange-600 hidden">
+      Remidi Level 3
+    </button>
+
+    <button id="btnLevel3"
+      onclick="Beranda()"
+      class="w-full md:w-auto px-6 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700">
+      Beranda
+    </button>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   🔗 1. URL WEB APP GOOGLE APPS SCRIPT (SAMA DENGAN LEVEL 1 & 2)
+   ============================================================ */
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwqw_MPk0o4VBAWY13uMBq9SPSwQwgQdLxTlr6MHsZDkJJTf8CFtdnd3EY3thTWfO6a/exec";
+
+/* ============================================================
+   🔥 2. FUNGSI UMUM UNTUK KIRIM DATA KE GOOGLE SHEET
+   ============================================================ */
+function kirimKeGoogleSheet(level, rekap, nilaiPersen, statusText) {
+  const nama = sessionStorage.getItem("nama_siswa") || "Belum diisi";
+  const bnData =  sessionStorage.getItem("BN_Data") || "";
+
+  const payload = {
+    level: level,              // Level 3 → dikirim '3'
+    nama: nama,
+    nilaiPersen: nilaiPersen,
+    totalBenar: rekap.totalBenar,
+    totalSalah: rekap.totalSalah,
+    status: statusText,
+    bnData: bnData
+  };
+
+  fetch(WEBAPP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(err => console.error("Gagal mengirim ke Google Sheet:", err));
+}
+
+/* ============================================================
+   🔥 3. LOGIKA HALAMAN HASIL LEVEL 3
+   ============================================================ */
+
+const KKM_LEVEL3 = 80;  // KKM level 3
+let nilaiPersenGlobal = 0;
+
+function muatRekap() {
+
+  // ⭐ Tampilkan nama siswa
+  const nama = sessionStorage.getItem("nama_siswa") || "Belum diisi";
+  document.getElementById("namaSiswaDisplay").textContent = nama;
+
+  const raw = sessionStorage.getItem("rekap_level3");
+  const ringkasanDiv = document.getElementById("ringkasan");
+  const tbody = document.getElementById("tbodyRiwayat");
+  const remidiListDiv = document.getElementById("remidiList");
+  const btnRemidi = document.getElementById("btnRemidi");
+
+  if (!raw) {
+    ringkasanDiv.innerHTML = "<b>Belum ada data Level 3.</b>";
+    remidiListDiv.innerHTML = "Belum ada soal yang bisa diremidi.";
+    btnRemidi.classList.add("hidden");
+    return;
+  }
+
+  const rekap = JSON.parse(raw);
+  const totalSoal = rekap.totalBenar + rekap.totalSalah;
+
+  const nilaiPersen = totalSoal > 0
+    ? Math.round((rekap.totalBenar / totalSoal) * 100)
+    : 0;
+
+  nilaiPersenGlobal = nilaiPersen;
+
+  const statusHTML = nilaiPersen >= KKM_LEVEL3
+    ? `<span class='text-emerald-700 font-bold'>LULUS</span>`
+    : `<span class='text-rose-700 font-bold'>BELUM TUNTAS</span>`;
+
+  const statusText = nilaiPersen >= KKM_LEVEL3 ? "LULUS" : "BELUM TUNTAS";
+
+  // Ringkasan nilai
+  ringkasanDiv.innerHTML =
+    `<div class='text-lg space-y-1'>
+      <div><b>Total Soal:</b> ${totalSoal}</div>
+      <div><b>Benar:</b> ${rekap.totalBenar} | <b>Salah:</b> ${rekap.totalSalah}</div>
+      <div><b>Nilai:</b> ${nilaiPersen} / 100</div>
+      <div><b>KKM:</b> ${KKM_LEVEL3}</div>
+      <div><b>Status:</b> ${statusHTML}</div>
+    </div>`;
+
+  // 🔥 KIRIM DATA LEVEL 3 KE GOOGLE SHEET
+  kirimKeGoogleSheet(3, rekap, nilaiPersen, statusText);
+
+  // Riwayat pengerjaan
+  tbody.innerHTML = "";
+  rekap.daftar.forEach((item, idx) => {
+    tbody.innerHTML += `
+      <tr>
+        <td class="p-2 border border-slate-300 text-center">${idx + 1}</td>
+        <td class="p-2 border border-slate-300 text-center">${item.soalId}</td>
+        <td class="p-2 border border-slate-300 text-center">${item.jawaban}</td>
+        <td class="p-2 border border-slate-300 text-center">${item.kunci}</td>
+        <td class="p-2 border border-slate-300 text-center ${item.benar ? "text-emerald-600" : "text-rose-600"}">
+          ${item.benar ? "Benar" : "Salah"}
+        </td>
+        <td class="p-2 border border-slate-300 text-xs">${item.waktu}</td>
+      </tr>`;
+  });
+
+  // Remidi
+  const salahList = rekap.daftar.filter(i => !i.benar);
+
+  if (nilaiPersen >= KKM_LEVEL3) {
+    remidiListDiv.innerHTML =
+      "<span class='text-emerald-700 font-semibold'>Kamu berhasil menyelesaikan Level 3 tanpa perlu remidi ⭐</span>";
+  } else {
+    if (salahList.length === 0) {
+      remidiListDiv.innerHTML =
+        "<span class='text-emerald-700 font-semibold'>Tidak ada soal yang salah 🎉</span>";
+    } else {
+      let html = "<p class='mb-2 text-sm'>Klik soal salah untuk remidi:</p><div class='flex flex-wrap gap-2'>";
+      const used = new Set();
+
+      salahList.forEach(i => {
+        if (!used.has(i.soalId)) {
+          used.add(i.soalId);
+          html += `
+            <button onclick="bukaSoal('${i.soalId}')"
+              class="px-3 py-1 rounded-full bg-amber-500 text-white text-sm hover:bg-amber-600">
+              Ulangi ${i.soalId}
+            </button>`;
+        }
+      });
+
+      html += "</div>";
+      remidiListDiv.innerHTML = html;
+    }
+  }
+
+  if (nilaiPersen < KKM_LEVEL3) {
+    btnRemidi.classList.remove("hidden");
+  } else {
+    btnRemidi.classList.add("hidden");
+  }
+}
+
+// 🔄 Buka soal remidi
+function bukaSoal(id) {
+  window.location.href = id + ".html";
+}
+
+function Beranda() {
+  if (nilaiPersenGlobal >= KKM_LEVEL3) {
+    // ✅ tandai Level 3 SUDAH selesai di sesi ini
+    sessionStorage.setItem("level3_selesai", "true");
+    window.location.href = "cba3.html";
+  } else {
+    alert("Belum memenuhi KKM. Silakan remidi terlebih dahulu.");
+  }
+}
+
+// 🔥 Remidi Level 3
+function remidiLevel3() {
+  if (confirm("Mengulang semua soal Level 3 untuk remidi?")) {
+    sessionStorage.removeItem("rekap_level3");
+    alert("Data Level 3 berhasil di-reset. Kamu akan mengulang dari awal.");
+    window.location.href = "lv3soal1.html";
+  }
+}
+
+window.onload = muatRekap;
+</script>
+
+</body>
+</html>

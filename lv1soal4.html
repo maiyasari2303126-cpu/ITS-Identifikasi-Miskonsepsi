@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Matematika SMP – Grafik Garis Robot dan Mainan</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Menggunakan font Inter dan skema warna cerah */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <div class="p-6 md:p-8 bg-gradient-to-r from-cyan-400 to-blue-600 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Robot Penjual Mainan Cerdas</h1>
+            <p class="text-lg font-light">Menganalisis Laju Penjualan Mainan Koleksi</p>
+        </div>
+        <div class="text-5xl"></div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+
+        <div class="w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">Stok Mainan Robot A</h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="lineChartRobot"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-gray-600 font-semibold">Sumbu Y: Sisa Stok Mainan | Sumbu X: Waktu Penjualan (Jam)</p>
+        </div>
+
+        <div class="w-full">
+            <div class="question-box p-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-blue-700 mb-4">
+                    Nomor 4
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6">
+                    Grafik menunjukkan sisa stok mainan koleksi yang dijual oleh Robot A. Robot A mulai dengan 10 mainan dan menghabiskan stoknya (sisa 0) dalam 5 jam.
+                    <br><br>
+                    Robot B adalah model yang lebih besar, namun memiliki laju penjualan yang SAMA persis dengan Robot A. Jika Robot B membawa total 15 mainan di awal, berapa lama waktu yang dibutuhkan Robot B untuk menjual habis mainannya sampai sisa 0 stok?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-blue-600 h-5 w-5 mr-4">
+                        <span>A. 6,5 jam</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-blue-600 h-5 w-5 mr-4">
+                        <span>B. 7,0 jam</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-blue-600 h-5 w-5 mr-4">
+                        <span>C. 7,5 jam</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-blue-600 h-5 w-5 mr-4">
+                        <span>D. 8,0 jam</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-blue-700 active:scale-[0.98]">
+                    SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+                <div id="nextBox" style="margin-top:10px; display:none;">
+                    <button onclick="keNomor5()" class="w-full px-6 py-3 bg-sky-600 text-white font-bold rounded-xl shadow hover:bg-sky-700 transition">
+                        Nomor 5 
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK GARIS ======
+window.onload = function() {
+    const ctx = document.getElementById('lineChartRobot').getContext('2d');
+    
+    // Data Robot A (y = -2x + 10)
+    // Untuk Chart.js tipe 'line' sederhana, gunakan array data biasa dan array labels.
+    const labelsJam = [0, 1, 2, 3, 4, 5]; // Sumbu X
+    const sisaStok = [10, 8, 6, 4, 2, 0]; // Sumbu Y
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            // ✅ Menggunakan array labels (Jam 0 s/d Jam 5)
+            labels: labelsJam.map(j => `${j} Jam`), 
+            datasets: [{
+                label: 'Sisa Stok (Robot A)',
+                // ✅ Menggunakan array data sederhana
+                data: sisaStok, 
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: '#1D4ED8',
+                borderWidth: 3,
+                tension: 0.1,
+                fill: false,
+                pointRadius: 6,
+                pointBackgroundColor: '#F59E0B'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Grafik Garis Sisa Stok Robot A'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 10,
+                    title: {
+                        display: true,
+                        text: 'Sisa Stok Mainan',
+                        font: { weight: 'bold' }
+                    },
+                    ticks: { stepSize: 2 }
+                },
+                x: {
+                    // Jika data X berupa angka, kita bisa memaksa tipe 'linear' atau biarkan 'category'
+                    title: {
+                        display: true,
+                        text: 'Waktu Penjualan (Jam)',
+                        font: { weight: 'bold' }
+                    },
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+};
+
+// ====== SISTEM CEK JAWABAN HOTS ======
+// Perhitungan:
+// 1. Laju penjualan Robot A = (Stok Awal - Stok Akhir) / Waktu = (10 - 0) / 5 jam = 2 mainan/jam
+// 2. Waktu habis Robot B = Stok Awal B / Laju = 15 mainan / 2 mainan/jam = 7.5 jam
+const kunciJawaban = "C"; 
+
+const miskonsepsiMap = {
+    "A": "Miskonsepsi: Anda mungkin menghitung laju Robot A secara tidak tepat atau salah membagi (15 / 2 = 7.5, bukan 6.5).",
+    "B": "Miskonsepsi: Anda mungkin membulatkan hasil 7.5 jam menjadi 7 jam, padahal laju penjualan konstan.",
+    "D": "Miskonsepsi: Anda salah menentukan laju Robot A. Periksa kembali laju 10 mainan dalam 5 jam."
+};
+
+// ====== FUNGSI SIMPAN NILAI LEVEL 1 KE LOCALSTORAGE ======
+function simpanJawabanLevel1({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level1";
+
+    let rekap = sessionStorage.getItem(KEY);
+    if (!rekap) {
+        rekap = {
+            totalBenar: 0,
+            totalSalah: 0,
+            daftar: []
+        };
+    } else {
+        rekap = JSON.parse(rekap);
+    }
+
+    const waktu = new Date().toLocaleString();
+
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+    sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// --------------------------------------------------------
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse(sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = (answer === kunciJawaban);
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🎉 Jawaban Luar Biasa! <br>" +
+            "1. Laju penjualan Robot A (Gradien Garis) adalah 10 mainan dalam 5 jam, atau <b>2 mainan/jam</b>.<br>" +
+            "2. Robot B memiliki laju yang sama, sehingga waktu habis = Stok B ÷ Laju = 15 ÷ 2 = <b>7,5 jam</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Analisismu Hampir Tepat! <br>" +
+            "Perhatikan Konsep Kunci: **Laju Penjualan** adalah sama dengan **Kemiringan Garis (Gradien)**.<br>" +
+            "1. Laju Robot A = $\\frac{\\text{Perubahan Stok}}{\\text{Perubahan Waktu}} = \\frac{10}{5} = 2$ mainan/jam.<br>" +
+            "2. Waktu Robot B = $\\frac{\\text{Stok Awal B}}{\\text{Laju}} = \\frac{15}{2} = 7,5$ jam.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menentukan laju atau menghitung waktu total.") +
+            "</i>";
+    }
+
+    // kunci semua opsi
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+    document.querySelector('button[onclick="cekJawaban()"]').disabled = true;
+
+    // simpan nilai
+simpanJawabanLevel1({
+  soalId: "Nomor4",
+  benar,
+  jawaban: answer,
+  kunci: kunciJawaban
+});
+
+// 🔥 update BN untuk M1
+updateBN("M4", benar);
+    // tampilkan tombol lanjut
+    document.getElementById("nextBox").style.display = "block";
+}
+
+// fungsi ke soal 5
+function keNomor5() {
+    window.location.href = "lv1soal5.html";
+}
+</script>
+
+</body>
+</html>

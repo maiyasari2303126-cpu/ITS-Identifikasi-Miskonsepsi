@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Matematika SMP – Grafik Batang Lucu</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Menggunakan font Inter dan warna cerah */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-purple-100 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Menggemaskan -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-pink-400 to-purple-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Survei Dessert Monster Cilik</h1>
+            <p class="text-lg font-light">Total 150 Monster Cilik telah disurvei. Ayo bantu hitung!</p>
+        </div>
+        <div class="text-5xl">
+            👾🍦
+        </div>
+    </div>
+
+    <!-- KONTEN: Grafik di atas, pertanyaan di bawah -->
+    <div class="p-6 md:p-10 flex flex-col gap-8">
+        
+        <!-- Kolom Grafik Batang (atas) -->
+        <div class="w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Jumlah Monster Berdasarkan Dessert Favorit
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner">
+                <canvas id="barChartDessert"></canvas>
+            </div>
+            <p class="mt-2 text-sm text-red-500 font-semibold">
+                Tinggi batang "Es Krim Lumpur" tidak diketahui!
+            </p>
+        </div>
+
+        <!-- Kolom Pertanyaan (bawah) -->
+        <div class="w-full">
+            <div class="question-box p-6 bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-purple-700 mb-4">
+                    Nomor 3
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6">
+                    Total monster cilik yang disurvei adalah 150 ekor. Tinggi batang untuk Es Krim Lumpur tidak tertulis.
+                    <br><br>
+                    Pertanyaan: Berapa persen total monster yang memilih Smoothie Brokoli dan Es Krim Lumpur jika dibandingkan dengan seluruh monster cilik?
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>A. 30 Persen</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>B. 40 Persen</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>C. 50 Persen</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-yellow-100 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-purple-600 h-5 w-5 mr-4">
+                        <span>D. 60 Persen</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" class="mt-8 w-full px-8 py-3 bg-purple-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-purple-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+                
+                <div id="nextBox" style="margin-top:10px; display:none;">
+                    <button onclick="keNomor4()" class="w-full px-6 py-3 bg-pink-500 text-white font-bold rounded-xl shadow hover:bg-pink-600 transition">
+                        Nomor 4
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA DAN KONFIGURASI GRAFIK BATANG ======
+window.onload = function() {
+    const ctx = document.getElementById('barChartDessert').getContext('2d');
+    
+    // Data Jumlah Monster Cilik
+    const dataMonster = [
+        { label: 'Jello Pelangi', count: 50 },
+        { label: 'Kue Kucing', count: 40 },
+        { label: 'Smoothie Brokoli', count: 30 },
+        { label: 'Es Krim Lumpur', count: 30 } // 150 - (50 + 40 + 30) = 30
+    ];
+
+    const labels = dataMonster.map(d => d.label);
+    const dataCounts = dataMonster.map(d => d.count);
+    
+    const colors = [
+        '#FF9F9F',
+        '#A0D99D',
+        '#7986CB',
+        '#FFDA9E'
+    ];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Jumlah Monster',
+                data: dataCounts,
+                backgroundColor: colors,
+                borderColor: '#6D28D9',
+                borderWidth: 1.5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
+                        label: function(context) {
+                            if (context.label === 'Es Krim Lumpur') {
+                                return 'Jumlah: ?';
+                            }
+                            return 'Jumlah: ' + context.raw;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Jumlah Monster',
+                        font: { weight: 'bold' }
+                    },
+                    ticks: { stepSize: 10 }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Dessert Favorit',
+                        font: { weight: 'bold' }
+                    },
+                    afterBuildTicks: function(axis) {
+                        if (axis.chart.data.labels.includes('Es Krim Lumpur')) {
+                            const index = axis.chart.data.labels.indexOf('Es Krim Lumpur');
+                            if (axis.ticks[index]) {
+                                axis.ticks[index].label = 'Es Krim Lumpur (?)';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+};
+
+// ====== SISTEM CEK JAWABAN HOTS ======
+const totalMonster = 150; 
+const kunciJawaban = "B"; 
+
+const miskonsepsiMap = {
+    "A": "Miskonsepsi: Hanya menghitung salah satu kategori (Smoothie Brokoli saja = 20%).",
+    "C": "Miskonsepsi: Menganggap jumlah yang hilang 45 monster, sehingga total 75 monster (50%).",
+    "D": "Miskonsepsi: Menganggap jumlah yang hilang 60 monster, padahal seharusnya 30."
+};
+
+// ====== FUNGSI SIMPAN NILAI LEVEL 1 KE LOCALSTORAGE ======
+function simpanJawabanLevel1({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level1";
+
+    let rekap = sessionStorage.getItem(KEY);
+    if (!rekap) {
+        rekap = {
+            totalBenar: 0,
+            totalSalah: 0,
+            daftar: []
+        };
+    } else {
+        rekap = JSON.parse(rekap);
+    }
+
+    const waktu = new Date().toLocaleString();
+
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+    sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse(sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+  sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+function cekJawaban() {
+    const pilihan = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800 transition-all duration-300";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar = (answer === kunciJawaban);
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "🥳 Jawaban Super Benar! <br>" +
+            "1. Langkah Awal: Hitung Monster Es Krim Lumpur = 150 - (50 + 40 + 30) = 30 monster.<br>" +
+            "2. Langkah Kedua: Total monster yang diminta = Smoothie Brokoli (30) + Es Krim Lumpur (30) = 60 monster.<br>" +
+            "3. Langkah Akhir: Persentase = (60 / 150) × 100% = 40%. Luar biasa!";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800 transition-all duration-300";
+        feedbackDiv.innerHTML =
+            "❌ Oops, Ada Kesalahan Hitung! <br>" +
+            "Ingat, ini soal multi-langkah: <br>" +
+            "1. Hitung dulu jumlah Monster Es Krim Lumpur yang hilang.<br>" +
+            "2. Tambahkan dengan jumlah Smoothie Brokoli.<br>" +
+            "3. Ubah jumlah gabungan tersebut menjadi persen dari total 150 monster.<br>" +
+            "Miskonsepsi: <i>" +
+            (miskonsepsiMap[answer] || "Kesalahan dalam menghitung jumlah yang hilang atau mengonversi ke persentase.") +
+            "</i>";
+    }
+
+    // kunci semua opsi
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // simpan nilai
+simpanJawabanLevel1({
+  soalId: "Nomor3",
+  benar,
+  jawaban: answer,
+  kunci: kunciJawaban
+});
+
+// 🔥 update BN untuk M1
+updateBN("M3", benar);
+
+
+    // tampilkan tombol lanjut
+    document.getElementById("nextBox").style.display = "block";
+}
+
+// tombol ke soal 4
+function keNomor4() {
+    window.location.href = "lv1soal4.html";
+}
+</script>
+
+</body>
+</html>

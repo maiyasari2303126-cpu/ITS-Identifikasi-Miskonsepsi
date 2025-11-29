@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis HOTS Kelas 9 – Analisis Titik Potong Tiga Garis (Level 3 – Soal 2)</title>
+
+    <!-- Import Chart.js dan Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header Tema Peta Harta Karun -->
+    <div class="p-6 md:p-8 bg-gradient-to-r from-orange-500 via-yellow-400 to-green-500 text-white flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black mb-1">Misi Tiga Garis: Menemukan Koordinat Harta Karun</h1>
+            <p class="text-lg font-light">Analisis Titik Potong Pecahan dan Perhitungan Rumit (Level 3 – Soal 2)</p>
+        </div>
+        <div class="text-5xl">
+            🗺️✨
+        </div>
+    </div>
+
+    <div class="p-6 md:p-10 flex flex-col   gap-8">
+        
+        <!-- Kolom Grafik Garis -->
+        <div class="lg:w-full flex flex-col items-center">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 text-center border-b pb-2 w-full">
+                Visualisasi Lokasi Kunci (Titik P1, P2, P3)
+            </h2>
+            <div class="w-full h-64 md:h-80 flex items-center justify-center bg-gray-50 rounded-xl p-4 shadow-inner chart-container">
+                <canvas id="lineChartSuperHots"></canvas>
+            </div>
+            <div class="mt-4 p-3 bg-green-100 rounded-lg text-sm text-green-700 font-medium w-full">
+                Titik P2 memiliki koordinat pecahan. Teliti saat menyelesaikan sistem persamaannya!
+            </div>
+        </div>
+
+        <!-- Kolom Pertanyaan SUPER HOTS -->
+        <div class="lg:w-full">
+            <div class="question-box p-6 bg-orange-100 border-2 border-orange-500 rounded-xl shadow-lg">
+                <p class="text-2xl font-extrabold text-indigo-700 mb-4">
+                    Nomor 2
+                </p>
+                
+                <p class="text-lg text-gray-800 mb-6 font-medium">
+                    Tiga garis (Relasi-Fungsi) berpotongan dan membentuk Segitiga Kunci:
+                    <ul class="list-decimal list-inside ml-4 space-y-1 mt-4">
+                        <li>Garis L1 (Orange): y = x + 5</li>
+                        <li>Garis L2 (Ungu): y = 3x − 7</li>
+                        <li>Garis L3 (Hijau): y = 11 − x</li>
+                    </ul>
+                    <br>
+                    Tentukan tiga titik potong: P1 (L1 dan L2), P2 (L2 dan L3), dan P3 (L1 dan L3).
+                    <br><br>
+                    Misalkan Px adalah koordinat x dan Py adalah koordinat y dari setiap titik. Hitunglah nilai dari ekspresi:
+                    <br>
+                    <b>(4 × P2x) + (2 × P2y) − (P1x + P3y)</b>
+                </p>
+
+                <div class="space-y-4 text-gray-800">
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-orange-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="A" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>A. 15</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-orange-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="B" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>B. 17</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-orange-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="C" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>C. 19</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer p-3 rounded-lg bg-white shadow hover:bg-orange-200 transition duration-150">
+                        <input type="radio" name="jawaban" value="D" class="form-radio text-indigo-600 h-5 w-5 mr-4">
+                        <span>D. 21</span>
+                    </label>
+                </div>
+                
+                <button onclick="cekJawaban()" 
+                        class="mt-8 w-full px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md transition duration-300 transform hover:scale-[1.02] hover:bg-indigo-700 active:scale-[0.98]">
+                     SUBMIT
+                </button>
+
+                <div id="feedback" class="mt-6 p-4 rounded-xl text-md font-semibold border hidden transition-all duration-300"></div>
+
+                <!-- TOMBOL LANJUT KE SOAL 3 LEVEL 3 -->
+                <div id="nextBox" class="mt-6 hidden">
+                    <button onclick="kesoal3()" 
+                            class="w-full px-6 py-3 rounded-xl bg-emerald-600 text-white font-bold shadow-md hover:bg-emerald-700 transition">
+                        Nomor 3  
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== DATA & GRAFIK GARIS ======
+window.onload = function() {
+    // P1(6, 11), P2(4.5, 6.5), P3(3, 8)
+    const points = (line) => {
+        const data = [];
+        for (let x = 2; x <= 7; x += 0.2) {
+            let y;
+            if (line === 1) y = x + 5;      // L1
+            if (line === 2) y = 3 * x - 7;  // L2
+            if (line === 3) y = 11 - x;     // L3
+            data.push({ x, y });
+        }
+        return data;
+    };
+
+    const ctx = document.getElementById('lineChartSuperHots').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: 'L1: y = x + 5',
+                    data: points(1),
+                    borderColor: '#F97316',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    showLine: true,
+                    tension: 0
+                },
+                {
+                    label: 'L2: y = 3x − 7',
+                    data: points(2),
+                    borderColor: '#9333EA',
+                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    showLine: true,
+                    tension: 0
+                },
+                {
+                    label: 'L3: y = 11 − x',
+                    data: points(3),
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    showLine: true,
+                    tension: 0
+                },
+                {
+                    label: 'Titik Potong',
+                    data: [
+                        { x: 6,   y: 11 },   // P1
+                        { x: 4.5, y: 6.5 },  // P2
+                        { x: 3,   y: 8 }     // P3
+                    ],
+                    borderColor: '#3B82F6',
+                    backgroundColor: '#3B82F6',
+                    pointRadius: 7,
+                    showLine: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.label === 'Titik Potong') {
+                                return 'Titik: (' + context.parsed.x.toFixed(1) + ', ' + context.parsed.y.toFixed(1) + ')';
+                            }
+                            return context.dataset.label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 5,
+                    max: 17,
+                    title: { display: true, text: 'Koordinat Y' }
+                },
+                x: {
+                    beginAtZero: false,
+                    min: 2,
+                    max: 7,
+                    type: 'linear',
+                    title: { display: true, text: 'Koordinat X' }
+                }
+            }
+        }
+    });
+}
+
+// ====== ANALISIS MATEMATIS (RINGKAS) ======
+/*
+P1 (L1 & L2):
+    x + 5 = 3x − 7 → 12 = 2x → x = 6, y = 11
+
+P2 (L2 & L3):
+    3x − 7 = 11 − x → 4x = 18 → x = 4,5, y = 11 − 4,5 = 6,5
+
+P3 (L1 & L3):
+    x + 5 = 11 − x → 2x = 6 → x = 3, y = 8
+
+P1x = 6, P3y = 8, P2x = 4,5, P2y = 6,5
+
+Ekspresi:
+(4·P2x) + (2·P2y) − (P1x + P3y)
+= (4·4,5) + (2·6,5) − (6 + 8)
+= 18 + 13 − 14 = 17
+*/
+const kunciJawaban = "B"; // 17
+
+const miskonsepsiMap = {
+    "A": "Anda mungkin salah menghitung P2y (harusnya 6,5) atau salah pada operasi akhir: 18 + 13 − 14 = 17, bukan 15.",
+    "C": "Angka 19 terlalu besar; cek kembali P1x = 6 dan P3y = 8. Jumlah yang dikurangkan harus 14.",
+    "D": "Angka 21 muncul jika salah hitung salah satu titik potong atau salah dalam operasi pengurangan di akhir."
+};
+
+// ====== SIMPAN JAWABAN LEVEL 3 ======
+function simpanJawabanLevel3({ soalId, benar, jawaban, kunci }) {
+    const KEY = "rekap_level3";
+    let rekap = JSON.parse( sessionStorage.getItem(KEY) || "null");
+
+    if (!rekap) {
+        rekap = { totalBenar: 0, totalSalah: 0, daftar: [] };
+    }
+
+    const waktu = new Date().toLocaleString();
+    rekap.daftar.push({ soalId, benar, jawaban, kunci, waktu });
+
+    if (benar) rekap.totalBenar++;
+    else rekap.totalSalah++;
+
+     sessionStorage.setItem(KEY, JSON.stringify(rekap));
+}
+
+// ===================== BAYESIAN NETWORK GLOBAL =====================
+// Tambah node sampai M9 (supaya konsisten dengan soal 1–10)
+function initBN() {
+  let BN = JSON.parse( sessionStorage.getItem("BN_Data"));
+
+  if (!BN) {
+    BN = {
+      prior: {
+        M1: 0.4,
+        M2: 0.4,
+        M3: 0.4,
+        M4: 0.4,
+        M5: 0.4,
+        M6: 0.4,
+        M7: 0.4, // Soal 7: miskonsepsi sudut–persentase cupcake
+        M8: 0.4,
+        M9: 0.4
+      },
+      likelihood: {
+        M1: { benar: 0.3, salah: 0.7 },
+        M2: { benar: 0.3, salah: 0.7 },
+        M3: { benar: 0.3, salah: 0.7 },
+        M4: { benar: 0.3, salah: 0.7 },
+        M5: { benar: 0.3, salah: 0.7 },
+        M6: { benar: 0.3, salah: 0.7 },
+        M7: { benar: 0.3, salah: 0.7 },
+        M8: { benar: 0.3, salah: 0.7 },
+        M9: { benar: 0.3, salah: 0.7 }
+      },
+      posterior: {}
+    };
+  }
+
+  return BN;
+}
+
+// Update BN berdasarkan jawaban
+function updateBN(node, benar) {
+  let BN = initBN();
+
+  const prior   = BN.prior[node];
+  const like    = benar ? BN.likelihood[node].benar : BN.likelihood[node].salah;
+  const likeNot = 1 - like;
+
+  const num = prior * like;
+  const den = num + (1 - prior) * likeNot;
+  const posterior = den === 0 ? prior : num / den;
+
+  BN.prior[node]     = Number(posterior.toFixed(4));
+  BN.posterior[node] = BN.prior[node];
+
+   sessionStorage.setItem("BN_Data", JSON.stringify(BN));
+}
+
+// ====== CEK JAWABAN ======
+function cekJawaban() {
+    const pilihan     = document.querySelector('input[name="jawaban"]:checked');
+    const feedbackDiv = document.getElementById("feedback");
+    feedbackDiv.classList.remove('hidden');
+
+    if (!pilihan) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-yellow-500 bg-yellow-100 text-yellow-800";
+        feedbackDiv.innerHTML = "❗ Silakan pilih jawabanmu terlebih dahulu untuk melihat analisisnya.";
+        return;
+    }
+
+    const answer = pilihan.value;
+    const benar  = answer === kunciJawaban;
+
+    if (benar) {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-green-500 bg-green-100 text-green-800";
+        feedbackDiv.innerHTML =
+            "🧠 Kunci Jawaban Benar!<br>" +
+            "1. Titik potong: P1(6, 11), P2(4,5; 6,5), P3(3, 8).<br>" +
+            "2. Substitusi ke ekspresi: (4·4,5) + (2·6,5) − (6 + 8) = 18 + 13 − 14 = <b>17</b>.";
+    } else {
+        feedbackDiv.className = "mt-6 p-4 rounded-xl text-md font-semibold border border-red-500 bg-red-100 text-red-800";
+        feedbackDiv.innerHTML =
+            "❌ Analisis Titik Potong Kurang Tepat!<br>" +
+            "Pastikan kembali: P2 dari 3x − 7 = 11 − x harus memberi x = 4,5 dan y = 6,5, lalu masukkan secara hati-hati ke ekspresi akhir.<br>" +
+            "Miskonsepsi terdeteksi: <i>" +
+            (miskonsepsiMap[answer] || "Kemungkinan kesalahan pada penyelesaian sistem persamaan atau operasi aljabar di langkah terakhir.") +
+            "</i>";
+    }
+
+    // Simpan ke rekap LEVEL 3
+    simpanJawabanLevel3({
+        soalId: "lv3soal2",   // ⬅️ soal 2 level 3
+        benar,
+        jawaban: answer,
+        kunci: kunciJawaban
+    });
+
+    // Update BN node M8
+    updateBN("M4", benar);
+
+    // Disable opsi setelah menjawab
+    document.querySelectorAll('input[name="jawaban"]').forEach(r => r.disabled = true);
+
+    // Tampilkan tombol lanjut
+    document.getElementById("nextBox").classList.remove("hidden");
+}
+
+// ====== PINDAH KE SOAL 3 LEVEL 3 ======
+function kesoal3() {
+    window.location.href = "lv3soal3.html";
+}
+</script>
+
+</body>
+</html>

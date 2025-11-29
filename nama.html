@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masukkan Nama</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-blue-50 min-h-screen flex items-center justify-center p-6">
+
+<div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full">
+    <h1 class="text-3xl font-bold text-blue-700 text-center mb-4">
+        Selamat Datang 👋
+    </h1>
+    <p class="text-gray-600 text-center mb-6">
+        Silakan isi nama lengkapmu sebelum mulai mengerjakan.
+    </p>
+
+    <label class="block mb-2 text-gray-700 font-semibold">Nama Siswa</label>
+    <input id="namaSiswa" type="text" 
+        class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-400"
+        placeholder="Masukkan nama">
+
+    <button onclick="mulai()"
+        class="w-full mt-6 bg-blue-600 text-white p-3 rounded-xl font-bold hover:bg-blue-700">
+        SUBMIT
+    </button>
+</div>
+
+<script>
+// ================================================
+// 1. MASUKKAN GOOGLE WEBAPP URL DI SINI
+// ================================================
+const WEBAPP_URL = 
+"https://script.google.com/macros/s/AKfycbzZ_z6vgHDAWwmboMdV5EBIciB4x47NvLbsAJE0i1TbVaclCuTuKqYjv2cgSnfNyVBp/exec";
+
+// ================================================
+// 2. FUNGSI KIRIM NAMA KE GOOGLE SHEET (OPSIONAL)
+// ================================================
+function kirimNamaKeSheet(nama) {
+    const payload = {
+        level: 0,          // level 0 = hanya mengisi nama (belum mulai)
+        nama: nama,
+        nilaiPersen: "",
+        totalBenar: "",
+        totalSalah: "",
+        status: "MEMULAI",
+        bnData: ""
+    };
+
+    fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload)
+    }).catch(err => console.error("Gagal mengirim nama:", err));
+}
+
+// ================================================
+// 3. KETIKA TOMBOL SUBMIT DITEKAN
+// ================================================
+function mulai() {
+    const nama = document.getElementById("namaSiswa").value.trim();
+
+    if (nama === "") {
+        alert("Nama tidak boleh kosong!");
+        return;
+    }
+
+    // Simpan nama ke  sessionStorage → dipakai Level1,2,3
+     sessionStorage.setItem("nama_siswa", nama);
+
+    // Kirim nama ke Google Sheets (START LOG)
+    kirimNamaKeSheet(nama);
+
+    // Pindah ke halaman beranda level
+    window.location.href = "cba3.html";
+}
+</script>
+
+</body>
+</html>
